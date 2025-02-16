@@ -1,0 +1,58 @@
+<div class="container">
+  <h1>Faça seu Login abaixo</h1>
+
+  <form class="formulario" [formGroup]="formGroup">
+
+    <div class="form-group">
+
+      <label for="email">Email:</label>
+      <input
+        id="email"
+        type="text"
+        [formControl]="email"
+        placeholder="Insira aqui seu e-mail"
+        aria-label="Digite seu e-mail"/>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Senha:</label>
+      <div class="password-container">
+        <input
+          id="password"
+          [type]="showPassword ? 'text' : 'password'"
+          [formControl]="senha"
+          placeholder="Insira aqui sua senha"
+          aria-label="Digite sua senha"/>
+
+        <span class="toggle-password" (click)="togglePasswordVisibility()">
+          
+          <img
+            *ngIf="!showPassword"
+            ngSrc="assets/olho-senha-aberta.png"
+            width="32"
+            height="32"
+            alt="Mostrar senha"/>
+          
+          <img
+            *ngIf="showPassword"
+            ngSrc="assets/olho-senha-bloqueada.png"
+            width="32"
+            height="32"
+            alt="Ocultar senha"/>
+        </span>
+      </div>
+    </div>
+
+    <button class="btn-login" type="submit">LOGIN</button>
+
+    <button type="button" class="btn-google">
+      <img ngSrc="assets/google.png" width="18" height="18" alt="Google logo"/>
+      Login com Google
+    </button>
+
+    <a href="#" class="esqueceu-senha" routerLink="/esqueceu-senha"
+    routerLinkActive="active" 
+    ariaCurrentWhenActive="page">Esqueceu sua senha?</a>
+  </form>
+
+</div>

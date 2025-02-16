@@ -1,0 +1,3 @@
+<google-map height="500px" width="100%">
+    <map-marker *ngFor="let entregador of entregadores" [position]="{ lat: entregador.lat, lng: entregador.lng }"></map-marker>
+</google-map>

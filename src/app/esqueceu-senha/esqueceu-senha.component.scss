@@ -1,0 +1,74 @@
+@use "sass:color";
+@use '../variables.scss' as vars;
+
+.container {
+    margin-top: 8vh;
+    padding: 0;
+    width: 50vw;
+    height: 50vh;
+    top: 40%;
+    left: 50%;
+    transform: translate(50%, 50%);
+    gap: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    box-sizing: border-box;
+    border-radius: 16px;
+    box-shadow: 1px 5px 10px vars.$thrid-color;
+}
+
+h1 {
+    font-family: vars.$font-primary;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: vars.$text-color;
+}
+
+label {
+    font-family: vars.$font-secondary;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: #4A4A4A;
+}
+
+input {
+    width: 100%;
+    height: 60px;
+    border-radius: 16px;
+    background: #FFFFFF;
+    border: vars.$secondary-color;
+    padding: 8px 12px;
+    border-radius: 16px;
+    box-shadow: 1px 2px 6px vars.$primary-color;
+
+    &:focus {
+        outline: none;
+        border-color: color.adjust(vars.$secondary-color, $lightness: 10%);
+    }
+}
+
+.btn-enviar-nova-senha {
+    width: 30%;
+    height: 36px;
+    font-family: vars.$font-primary;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    color: #FFFFFF;
+    background: vars.$primary-color;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: color.adjust(vars.$primary-color, $lightness: 10%);
+    }
+}

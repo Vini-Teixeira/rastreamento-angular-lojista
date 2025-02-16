@@ -1,0 +1,97 @@
+<div class="container">
+  <h1>Insira os dados abaixo para se registrar</h1>
+
+  <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+
+    <div class="row">
+
+      <div class="input-group">
+        <label>Nome:</label>
+        <input type="text" formControlName="nome" placeholder="Insira aqui seu nome">
+        <div *ngIf="registroForm.get('nome')?.invalid && registroForm.get('nome')?.touched" class="error-message">
+          O nome é obrigatório e deve ter pelo menos 3 caracteres.
+        </div>
+
+      </div>
+
+      <div class="input-group">
+        <label>Telefone:</label>
+        <input type="text" formControlName="telefone" placeholder="Insira aqui seu telefone">
+        <div *ngIf="registroForm.get('telefone')?.invalid && registroForm.get('telefone')?.touched" class="error-message">
+          O telefone deve ter 10 ou 11 dígitos.
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="input-group">
+        <label>Senha:</label>
+        <input type="password" formControlName="senha" placeholder="Sua senha vai aqui...">
+        <div *ngIf="registroForm.get('senha')?.invalid && registroForm.get('senha')?.touched" class="error-message">
+          A senha é obrigatória e deve ter pelo menos 6 caracteres.
+        </div>
+        
+        <div class="forca-senha" [ngClass]="{
+          'fraca': forcaSenha === 'Fraca',
+          'media': forcaSenha === 'Média',
+          'forte': forcaSenha === 'Forte'
+        }">
+          Força da senha: {{ forcaSenha }}
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Confirmar senha:</label>
+        <input type="password" formControlName="confirmarSenha" placeholder="Confirme sua senha para prosseguir...">
+        <div *ngIf="registroForm.hasError('senhasNaoCombinam') && registroForm.get('confirmarSenha')?.touched" class="error-message">
+          As senhas não coincidem.
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="input-group">
+        <label>Email:</label>
+        <input type="text" formControlName="email" placeholder="Se você lembra do seu e-mail, insira-o aqui">
+        <div *ngIf="registroForm.get('email')?.invalid && registroForm.get('email')?.touched" class="error-message">
+          Email é obrigatório e deve ser válido.
+        </div>
+
+      </div>
+
+      <div class="input-group">
+        <label>CEP:</label>
+        <input type="text" formControlName="cep" placeholder="CEP referente ao endereço atual">
+        <div *ngIf="registroForm.get('cep')?.invalid && registroForm.get('cep')?.touched" class="error-message">
+          O CEP deve ter 8 dígitos.
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="input-group">
+      <label>Endereço:</label>
+      <input type="text" formControlName="endereco" placeholder="Endereço">
+      <div *ngIf="registroForm.get('endereco')?.invalid && registroForm.get('endereco')?.touched" class="error-message">
+        O endereço é obrigatório.
+      </div>
+
+    </div>
+
+    <div class="input-group">
+      <label>CPF/CNPJ:</label>
+      <input type="text" formControlName="cpfCnpj" placeholder="CPF/CNPJ">
+      <div *ngIf="registroForm.get('cpfCnpj')?.invalid && registroForm.get('cpfCnpj')?.touched" class="error-message">
+        CPF deve ter 11 dígitos ou CNPJ 14 dígitos.
+      </div>
+
+    </div>
+
+    <button class="btn-registrar" type="submit" [disabled]="registroForm.invalid">Registrar</button>
+  </form>
+</div>

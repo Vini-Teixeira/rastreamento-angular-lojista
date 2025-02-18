@@ -8,6 +8,14 @@ export class EntregadoresService {
     constructor(private ngZone: NgZone) {
         this.socket = io('http://localhost:3000', { path: '/socket.io' });
 
+        this.socket.on('connect', () => {
+            console.log('Conectado ao servidor Socket.IO');
+        });
+
+        this.socket.on('disconnect', () => {
+            console.log('Desconectado do servidor Socket.IO');
+        });
+
         this.socket.on('novaLocalizacao', (data) => {
             this.ngZone.run(() => {
                 console.log('Nova localização recebida:', data);
@@ -15,12 +23,12 @@ export class EntregadoresService {
         });
     }
 
-    getSocket(): Socket { 
+    getSocket(): Socket {
         return this.socket;
     }
 
     enviarLocalizacao(id: string, lat: number, lng: number) {
-        console.log("Enviando localização para o entregador com ID:", id);
+        console.log('Enviando localização:', { id, lat, lng });
         this.socket.emit('atualizarLocalizacao', { id, lat, lng });
     }
 }

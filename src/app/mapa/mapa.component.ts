@@ -1,4 +1,3 @@
-// mapa.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, NgZone, OnDestroy } from '@angular/core';
 import { GoogleMapsModule } from '@angular/google-maps';
@@ -32,7 +31,7 @@ export class MapaComponent implements OnInit, OnDestroy {
         });
 
         this.intervalId = setInterval(() => {
-            const entregadorId = '1';
+            const entregadorId = '67ae61d1b7acad3a554f4a7d';
             const lat = -23.5505 + Math.random() * 0.01;
             const lng = -46.6333 + Math.random() * 0.01;
 

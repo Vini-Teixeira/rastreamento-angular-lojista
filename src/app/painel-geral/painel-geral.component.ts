@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { EntregasService } from '../services/entregas.service';
 import { MapaComponent } from "../mapa/mapa.component";
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-painel-geral',
@@ -11,8 +10,9 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './painel-geral.component.html',
   styleUrl: './painel-geral.component.scss'
 })
+
 export class PainelGeralComponent {
-  constructor(private http:HttpClient,  private entregasService: EntregasService) {}
+  constructor(public entregasService: EntregasService) {}
 
   sidebarVisible = false;
   entregas: any[] = [];

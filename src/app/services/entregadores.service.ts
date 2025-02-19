@@ -6,7 +6,7 @@ export class EntregadoresService {
     private socket: Socket;
 
     constructor(private ngZone: NgZone) {
-        this.socket = io('http://localhost:3000', { path: '/socket.io' });
+        this.socket = io('http://localhost:3000/', { path: '/socket.io' });
 
         this.socket.on('connect', () => {
             console.log('Conectado ao servidor Socket.IO');

@@ -1,66 +1,81 @@
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../services/auth.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-registro-usuario',
-  imports: [ReactiveFormsModule, CommonModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './registro-usuario.component.html',
-  styleUrl: './registro-usuario.component.scss'
+  styleUrl: './registro-usuario.component.scss',
 })
 export class RegistroUsuarioComponent {
-  registroForm: FormGroup
-  forcaSenha: string = ''
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(private fb: FormBuilder) {
+  isLoading = false;
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
 
-    this.registroForm = this.fb.group({
-      nome: ['', [Validators.required, Validators.minLength(3)]],
-      telefone: ['', [Validators.required, Validators.pattern(/^\d{10,11}$/)]],
-      senha: ['', [Validators.required, Validators.minLength(6)]],
-      confirmarSenha: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      cep: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
-      endereco: ['', [Validators.required]],
-      cpfCnpj: ['', [Validators.required, Validators.pattern(/^\d{11,14}$/)]],
-    }, { validator: this.senhasCombinam })
+  registroForm: FormGroup;
 
-    this.registroForm.get('senha')?.valueChanges.subscribe((senha) => {
-      this.forcaSenha = this.verificarForcaSenha(senha)
-    })
+  constructor() {
+    this.registroForm = this.fb.group(
+      {
+        nomeCompleto: ['', [Validators.required, Validators.minLength(3)]],
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        confirmarSenha: ['', [Validators.required]],
+      },
+      { validators: this.senhasCombinam } 
+    );
   }
 
-  verificarForcaSenha(senha: string) {
-    const comprimento = senha.length;
-    const temNumeros = /\d/.test(senha);
-    const temMaiusculas = /[A-Z]/.test(senha);
-    const temMinusculas = /[a-z]/.test(senha);
-    const temEspeciais = /[!@#$%^&*(),.?":{}|<>]/.test(senha);
-  
-    let forca = 0;
-  
-    if (comprimento >= 8) forca++;
-    if (temNumeros) forca++;
-    if (temMaiusculas) forca++;
-    if (temMinusculas) forca++;
-    if (temEspeciais) forca++;
-    
-    if (forca <= 2) return 'Fraca';
-    if (forca <= 4) return 'Média';
-    return 'Forte';
+  senhasCombinam(control: AbstractControl): ValidationErrors | null {
+    const senha = control.get('password')?.value;
+    const confirmarSenha = control.get('confirmarSenha')?.value;
+    return senha === confirmarSenha ? null : { senhasNaoCombinam: true };
   }
 
-  senhasCombinam(formGroup: FormGroup) {
-    const senha = formGroup.get('senha')?.value
-    const confirmarSenha = formGroup.get('confirmarSenha')?.value
-    return senha === confirmarSenha ? null : { senhasNaoCombinam: true }
-  }
-
-  onSubmit() {
-    if (this.registroForm.valid) {
-      console.log('Formulário enviado', this.registroForm.value)
-    } else {
-      console.log('Formulário enviado')
+  onSubmit(): void {
+    if (this.registroForm.invalid) {
+      return;
     }
+
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+
+    const lojistaData = {
+      nomeCompleto: this.registroForm.value.nomeCompleto,
+      email: this.registroForm.value.email,
+      password: this.registroForm.value.password,
+    };
+
+    this.authService
+      .registerLojista(lojistaData)
+      .pipe(finalize(() => (this.isLoading = false)))
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Registro realizado com sucesso! Redirecionando para o login...';
+          setTimeout(() => {
+            this.router.navigate(['/card-login']);
+          }, 2000);
+        },
+        error: (err) => {
+          this.errorMessage = err.error?.message || 'Ocorreu um erro no registro.';
+        },
+      });
   }
 }

@@ -1,58 +1,66 @@
-<div class="container">
-  <h1>Faça seu Login abaixo</h1>
-
-  <form class="formulario" [formGroup]="formGroup">
-
-    <div class="form-group">
-
-      <label for="email">Email:</label>
-      <input
-        id="email"
-        type="text"
-        [formControl]="email"
-        placeholder="Insira aqui seu e-mail"
-        aria-label="Digite seu e-mail"/>
+<div class="login-container">
+  <div class="login-card">
+    <div class="card-header">
+      <h1 class="title">Bem-vindo(a)</h1>
+      <p class="subtitle">Acesse o painel da sua loja.</p>
     </div>
 
-    <div class="form-group">
-      <label for="password">Senha:</label>
-      <div class="password-container">
+    <!-- 1. Conectamos o evento (ngSubmit) do formulário ao nosso método onSubmit() -->
+    <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <!-- Campo de Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
         <input
-          id="password"
-          [type]="showPassword ? 'text' : 'password'"
-          [formControl]="senha"
-          placeholder="Insira aqui sua senha"
-          aria-label="Digite sua senha"/>
-
-        <span class="toggle-password" (click)="togglePasswordVisibility()">
-          
-          <img
-            *ngIf="!showPassword"
-            ngSrc="assets/olho-senha-aberta.png"
-            width="32"
-            height="32"
-            alt="Mostrar senha"/>
-          
-          <img
-            *ngIf="showPassword"
-            ngSrc="assets/olho-senha-bloqueada.png"
-            width="32"
-            height="32"
-            alt="Ocultar senha"/>
-        </span>
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="seu.email@loja.com"
+          [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+        />
       </div>
-    </div>
 
-    <button class="btn-login" type="submit">LOGIN</button>
+      <!-- Campo de Senha -->
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <div class="password-container">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="••••••••"
+            [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          />
+          <span class="toggle-password" (click)="togglePasswordVisibility()">
+            <img *ngIf="!showPassword" ngSrc="assets/olho-senha-aberta.png" width="24" height="24" alt="Mostrar senha" />
+            <img *ngIf="showPassword" ngSrc="assets/olho-senha-bloqueada.png" width="24" height="24" alt="Ocultar senha" />
+          </span>
+        </div>
+        <a class="forgot-password" routerLink="/esqueceu-senha">Esqueceu sua senha?</a>
+      </div>
+      
+      <!-- 2. Mensagem de Erro Condicional -->
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
 
+      <!-- 3. Botão de Login com estado de loading -->
+      <button class="btn-login" type="submit" [disabled]="loginForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Entrar</span>
+        <div *ngIf="isLoading" class="spinner"></div>
+      </button>
+    </form>
+
+    <div class="divider"><span>ou</span></div>
+
+    <!-- Botão de Login com Google (funcionalidade futura) -->
     <button type="button" class="btn-google">
-      <img ngSrc="assets/google.png" width="18" height="18" alt="Google logo"/>
-      Login com Google
+      <img ngSrc="assets/google.png" width="20" height="20" alt="Google logo" />
+      Entrar com Google
     </button>
-
-    <a href="#" class="esqueceu-senha" routerLink="/esqueceu-senha"
-    routerLinkActive="active" 
-    ariaCurrentWhenActive="page">Esqueceu sua senha?</a>
-  </form>
-
+    
+    <div class="register-link">
+      <span>Não tem uma conta?</span>
+      <a routerLink="/registro-usuario">Cadastre-se</a>
+    </div>
+  </div>
 </div>

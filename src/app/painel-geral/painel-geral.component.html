@@ -27,10 +27,20 @@
 </aside>
 
 <main>
-  <h1>Aqui você pode gerenciar suas entregas e acompanhar o progresso.</h1>
 
-  <div class="mapa-container">
-    <app-mapa></app-mapa>
+  <div class="map-wrapper"> 
+    <div class="mapa-container">
+      <app-mapa></app-mapa>
+    </div>
+    <app-dados-entrega
+      [valorEntrega]="detalhesEntrega.valor ?? null"
+      [nomeEntregador]="detalhesEntrega.entregador?.nome ?? null"
+      [enderecoOrigem]="detalhesEntrega.origem?.endereco ?? null"
+      [enderecoDestino]="detalhesEntrega.destino?.endereco ?? null"
+      [statusEntrega]="detalhesEntrega.status ?? null"
+      *ngIf="detalhesEntrega"
+    ></app-dados-entrega>
+    
   </div>
 
   <div *ngFor="let entrega of entregas">
@@ -38,7 +48,6 @@
     <p>Entregador: {{ entrega.entregadorId }}</p>
     <p>Destino: {{ entrega.lat }}, {{ entrega.lng }}</p>
   </div>
-  
 </main>
 
 <footer>© 2025 Vinicius Teixeira. Todos os direitos reservados.</footer>

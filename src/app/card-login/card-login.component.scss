@@ -1,178 +1,222 @@
-@use "sass:color";
-@use '../variables.scss' as vars;
-
-.container {
-    margin-top: 8vh;
-    padding: 0;
-    width: 50vw;
-    min-height: 60vh;
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    border-radius: 16px;
-    box-shadow: 2px 10px 20px vars.$thrid-color;
+// Estilos para um visual limpo e profissional
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f4f7f6;
+  font-family: 'Inter', sans-serif; // Sugestão de uma fonte limpa e moderna
 }
 
-h1 {
-    margin-top: 2vh;
-    font-family: vars.$font-primary;
-    font-size: 30px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    color: vars.$text-color;
-    margin-bottom: 3.5rem;
-    text-align: center;
+.login-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
 }
 
-.formulario {
-    font-family: vars.$font-primary;
-    font-size: 14px;
-    font-weight: 400;
-    color: #343A40;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
+.login-card {
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
+.card-header {
+  text-align: center;
+  .title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+  }
+  .subtitle {
+    font-size: 16px;
+    color: #666666;
+    margin-top: 8px;
+  }
+}
+
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
 .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-
-            
-    label {
-        font-family: vars.$font-secondary;
-        font-size: 14px;
-        font-weight: 300;
-        letter-spacing: 3px;
-        color: #4A4A4A;
-    }
-    
-    input {
-        width: 100%;
-        height: 60px;
-        border-radius: 16px;
-        background: #FFFFFF;
-        border: vars.$secondary-color;
-        padding: 8px 12px;
-        box-shadow: 0px 2px 2px 0px vars.$secondary-color;
-
-        &:focus {
-            outline: none;
-            border-color: color.adjust(vars.$secondary-color, $lightness: 10%);
-        }
-    }
-}    
-
-.btn-login {
-    width: 100%;
-    height: 48px;
-    font-family: vars.$font-primary;
-    font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  
+  label {
+    font-size: 14px;
     font-weight: 500;
-    letter-spacing: 3px;
-    color: #FFFFFF;
-    background-color: vars.$primary-color;
-    border: none;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    color: #333333;
+    margin-bottom: 8px;
+  }
 
-    &:hover {
-        background-color: color.adjust(vars.$primary-color, $lightness: 8%);
-    }
-}
-
-.btn-google {
+  input {
     width: 100%;
     height: 48px;
-    font-family: vars.$font-primary;
-    font-size: 14px;
-    font-weight: 400;
-    letter-spacing: 1px;
-    color: #000000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    background-color: transparent;
-    border: 2px solid vars.$primary-color;
     border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  
-    &:hover {
-        background-color: color.adjust(vars.$primary-color, $lightness: 10%);
-        color: #FFFFFF;
-    }
-}
-  
-.esqueceu-senha {
-    margin-top: 8px;
-    margin-bottom: 2vh;
-    font-family: vars.$font-secondary;
-    font-size: 14px;
-    text-align: center;
-    color: color.adjust(vars.$primary-color, $lightness: 15%);
-    text-decoration: none;
-    display: inline-block;
-    position: relative;
-    cursor: pointer;
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    padding: 0 16px;
+    font-size: 16px;
+    color: #1a1a1a;
+    transition: border-color 0.3s ease;
 
-    &:hover {
-        text-decoration: none;
+    &:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
 
-    &::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 0;
-        height: 2px;
-        background-color: color.adjust(vars.$primary-color, $lightness: 15%);
-        transition: width 0.3s ease;
+    &.invalid {
+      border-color: #dc3545;
     }
-
-    &:hover::after {
-        width: 100%;
-    }
+  }
 }
 
 .password-container {
-    position: relative;
-    width: 100%;
-  
-    input {
-      padding-right: 40px;
-    }
-  
-    .toggle-password {
-      position: absolute;
-      right: 12px;
-      top: 60%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #4A4A4A; 
-      transition: color 0.3s ease;
-  
-      &:hover {
-        color: vars.$primary-color;
-      }
+  position: relative;
+  width: 100%;
+
+  input {
+    padding-right: 48px;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+      opacity: 1;
     }
   }
+}
+
+.forgot-password {
+  font-size: 13px;
+  text-align: right;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 4px;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Estilo para a mensagem de erro
+.error-message {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.btn-login {
+  width: 100%;
+  height: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
+
+  &:disabled {
+    background-color: #a0c7ff;
+    cursor: not-allowed;
+  }
+}
+
+// Estilo para o spinner de carregamento
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.divider {
+  width: 100%;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  line-height: 0.1em;
+  margin: 10px 0 20px;
+  color: #666666;
+  font-size: 14px;
+  
+  span {
+    background:#fff; 
+    padding:0 10px; 
+  }
+}
+
+.btn-google {
+  width: 100%;
+  height: 50px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #f9f9f9;
+    border-color: #cccccc;
+  }
+}
+
+.register-link {
+  text-align: center;
+  font-size: 14px;
+  color: #333333;
+  
+  a {
+    color: #007bff;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 4px;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

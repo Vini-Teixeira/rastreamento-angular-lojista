@@ -1,0 +1,36 @@
+.status-container {
+    position: absolute;
+    top: 20px; 
+    left: 20px; 
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    padding: 15px;
+    z-index: 1000; 
+    width: 300px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+  }
+  
+  .status-item {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .label {
+    font-weight: bold;
+    margin-right: 8px;
+    width: 90px; 
+    display: inline-block;
+  }
+  
+  .value {
+    flex-grow: 1;
+  }
+  
+  h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+  }
+  

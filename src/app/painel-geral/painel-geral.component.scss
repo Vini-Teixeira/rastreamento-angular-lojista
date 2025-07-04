@@ -157,6 +157,9 @@ header {
 }
 
 main {
+  display: flex;
+  flex-direction: column;
+  position: relative;
   margin-left: 220px; 
   padding: 20px;
   margin-top: 60px;
@@ -168,21 +171,32 @@ main {
   }
 }
 
-h1 {
-  font-family: 'Montserrat', serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: #343A40;
-  margin-bottom: 6px;
+.map-wrapper{
+  position: relative;
+  width: 100%;
+}
+
+app-dados-entrega {
+  position: absolute;
+  top: 20px; 
+  left: 20px; /* Ajuste a distância da esquerda conforme necessário */
+  background-color: rgba(255, 255, 255, 0.9); /* Fundo branco com alguma transparência */
+  border: 1px solid #ccc;
+  padding: 15px;
+  z-index: 1000; /* Garante que fique acima do mapa */
+  width: 300px; /* Ajuste a largura conforme necessário */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
 }
 
 .mapa-container {
-  height: 440px;
+  height: 460px;
   width: 100%;
   border: 1px solid #ccc;
   border-radius: 8px;
   overflow: hidden;
 }
+
 
 .entregas-container {
   display: flex;

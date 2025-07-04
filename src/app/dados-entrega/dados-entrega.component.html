@@ -1,0 +1,23 @@
+<div class="status-container">
+    <h3>Detalhes da Entrega</h3>
+    <div class="status-item">
+      <span class="label">Valor:</span>
+      <span class="value">{{ valorEntrega | currency:'BRL':'symbol':'1.2-2' }}</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Entregador:</span>
+      <span class="value">{{ nomeEntregador || 'Não atribuído' }}</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Origem:</span>
+      <span class="value">{{ enderecoOrigem || 'Não definido' }}</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Destino:</span>
+      <span class="value">{{ enderecoDestino || 'Não definido' }}</span>
+    </div>
+    <div class="status-item">
+      <span class="label">Status:</span>
+      <span class="value">{{ statusEntrega || 'Aguardando' }}</span>
+    </div>
+    </div>

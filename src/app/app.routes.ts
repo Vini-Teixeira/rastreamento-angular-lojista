@@ -7,13 +7,14 @@ import { EsqueceuSenhaComponent } from './esqueceu-senha/esqueceu-senha.componen
 import { PainelGeralComponent } from './painel-geral/painel-geral.component';
 import { PerfilEntregadoresComponent } from './perfil-entregadores/perfil-entregadores.component';
 import { RelatorioEntregasComponent } from './relatorio-entregas/relatorio-entregas.component';
+import { authGuard } from './services/auth.guard';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent, title: 'Landing Page' },
     { path: 'card-login', component: CardLoginComponent, title: 'Login' },
     { path: 'esqueceu-senha', component: EsqueceuSenhaComponent, title: 'Esqueceu sua senha?' },
     { path: 'registro-usuario', component: RegistroUsuarioComponent, title: 'Registrar usuário' },
-    { path: 'painel-geral', component: PainelGeralComponent, title: 'Painel geral'},
+    { path: 'painel-geral', component: PainelGeralComponent, title: 'Painel geral', canActivate: [authGuard]},
     { path: 'relatorio-entregas', component: RelatorioEntregasComponent, title: 'Relatório' },
     { path: 'entregadores', component: EntregadoresComponent, title: 'Entregadores' },
     { path: 'perfil-entregadores', component: PerfilEntregadoresComponent, title: 'Perfil de entregadores' }

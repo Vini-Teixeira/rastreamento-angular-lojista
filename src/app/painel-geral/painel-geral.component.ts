@@ -1,9 +1,11 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component , OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core'; // 1. Importar inject
+import { RouterLink } from '@angular/router';
+import { Observable } from 'rxjs'; // 2. Importar Observable
 import { EntregasService } from '../services/entregas.service';
-import { MapaComponent } from "../mapa/mapa.component";
+import { MapaComponent } from '../mapa/mapa.component';
 import { DadosEntregaComponent } from '../dados-entrega/dados-entrega.component';
+import { MapLoaderService } from '../services/map-loader.service'; // 3. Importar o novo serviço
 
 interface DetalhesEntrega {
   valor?: number | null;
@@ -15,44 +17,61 @@ interface DetalhesEntrega {
 
 @Component({
   selector: 'app-painel-geral',
-  imports: [NgOptimizedImage, RouterLink, RouterLinkActive, CommonModule, MapaComponent, DadosEntregaComponent],
+  standalone: true, // Garante que o componente seja standalone
+  imports: [
+    CommonModule,
+    NgOptimizedImage,
+    RouterLink,
+    MapaComponent,
+    DadosEntregaComponent,
+  ],
   templateUrl: './painel-geral.component.html',
-  styleUrl: './painel-geral.component.scss'
+  styleUrl: './painel-geral.component.scss',
 })
-
 export class PainelGeralComponent implements OnInit {
-  detalhesEntrega: DetalhesEntrega | null = null
+  // Injeção de dependências moderna
+  public entregasService = inject(EntregasService);
+  private mapLoaderService = inject(MapLoaderService); // 4. Injetar o MapLoaderService
 
-  constructor(public entregasService: EntregasService) {}
+  // 5. Criar um Observable para controlar a visibilidade do mapa
+  public isApiLoaded$: Observable<boolean>;
 
   sidebarVisible = false;
   entregas: any[] = [];
+  detalhesEntrega: DetalhesEntrega | null = null;
+
+  constructor() {
+    // 6. Atribuir o Observable do serviço à nossa propriedade local
+    this.isApiLoaded$ = this.mapLoaderService.apiLoaded$;
+  }
+
+  ngOnInit(): void {
+    // A lógica para buscar entregas permanece a mesma.
+    // O HttpInterceptor cuidará da autenticação automaticamente.
+    this.entregasService.listarEntregas().subscribe((data) => {
+      this.entregas = data;
+    });
+  }
 
   buscarDetalhesEntrega(idEntrega: string): void {
-    this.entregasService.obterDetalhesEntregaEspecifica(idEntrega).subscribe( 
-      (data) => {
+    this.entregasService.obterDetalhesEntregaEspecifica(idEntrega).subscribe({
+      next: (data) => {
         this.detalhesEntrega = {
-          valor: data?.valor !== undefined ? data.valor : null,
-          entregador: data?.entregador ? { nome: data.entregador.nome !== undefined ? data.entregador.nome : null } : null,
-          origem: data?.origem ? { endereco: data.origem.endereco !== undefined ? data.origem.endereco : null } : null,
-          destino: data?.destino ? { endereco: data.destino.endereco !== undefined ? data.destino.endereco : null } : null,
-          status: data?.status !== undefined ? data.status : null,
+          valor: data?.valor,
+          entregador: data?.entregador,
+          origem: data?.origem,
+          destino: data?.destino,
+          status: data?.status,
         };
       },
-      (error) => {
+      error: (error) => {
         console.error('Erro ao buscar detalhes da entrega:', error);
         this.detalhesEntrega = null;
-      }
-    );
+      },
+    });
   }
 
   toggleSidebar() {
     this.sidebarVisible = !this.sidebarVisible;
-  }
-
-  ngOnInit(): void {
-    this.entregasService.listarEntregas().subscribe(data => {
-      this.entregas = data;
-    });
   }
 }

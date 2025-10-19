@@ -1,0 +1,26 @@
+<div class="form-container">
+  <h1>Solicitar Socorro</h1>
+  <p>Insira os detalhes abaixo para despachar o entregador mais próximo.</p>
+
+  <form [formGroup]="socorroForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="outline">
+      <mat-label>Endereço do Cliente</mat-label>
+      <input matInput formControlName="address" placeholder="Ex: Rua das Flores, 123, Bairro, Cidade" required>
+      <mat-error *ngIf="socorroForm.get('address')?.hasError('required')">
+        O endereço é obrigatório.
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Descrição do Serviço (Opcional)</mat-label>
+      <textarea matInput formControlName="serviceDescription" placeholder="Ex: Cliente relatou que a bateria não está a segurar a carga."></textarea>
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="socorroForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Solicitar Socorro</span>
+        <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+      </button>
+    </div>
+  </form>
+</div>

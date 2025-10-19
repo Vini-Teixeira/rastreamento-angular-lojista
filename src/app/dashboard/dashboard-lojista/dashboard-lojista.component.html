@@ -1,0 +1,22 @@
+<div class="chart-container">
+  <div *ngIf="isLoading" class="loading-overlay">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>A carregar resumo...</p>
+  </div>
+
+  <div *ngIf="error" class="error-overlay">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!isLoading && !error">
+    <h3>Resumo do Dia</h3>
+    <ngx-charts-pie-chart
+      [results]="chartData"
+      [scheme]="colorScheme"
+      [gradient]="true"
+      [legend]="true"
+      [legendPosition]="legendPosition"
+      [labels]="true">
+    </ngx-charts-pie-chart>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden; 
+}
+
+.content-area {
+  position: relative;
+  margin-left: 220px;
+  height: calc(100vh - 60px); 
+  padding: 20px;
+  margin-top: 60px; 
+  transition: margin-left 0.3s ease-in-out;
+  
+  overflow: hidden; 
+
+  &.collapsed {
+    margin-left: 60px; 
+  }
+}

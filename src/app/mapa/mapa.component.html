@@ -1,11 +1,23 @@
-<google-map
-  [options]="mapOptions"
-  height="460px"
-  width="100%"
->
-  <map-marker
-    *ngFor="let entregador of entregadores"
-    [position]="entregador"
-  ></map-marker>
-  <map-marker [position]="entregadorLocation"></map-marker>
-</google-map>
+<div class="map-container" *ngIf="apiLoaded$ | async">
+  <google-map height="100%" width="100%" [options]="mapOptions">
+    <map-marker
+      *ngFor="let marker of markers"
+      [position]="marker.position"
+      [title]="marker.title"
+      [options]="marker.options"
+    >
+    </map-marker>
+
+    <map-marker
+      *ngFor="let marker of markers"
+      [position]="marker.position"
+      [title]="marker.title"
+      [options]="marker.options"
+    ></map-marker>
+
+    <map-polyline
+      *ngFor="let polyline of polylines"
+      [options]="polyline"
+    ></map-polyline>
+  </google-map>
+</div>

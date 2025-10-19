@@ -2,6 +2,7 @@ import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common'; 
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { Observable, BehaviorSubject, tap, of } from 'rxjs';
 
 @Injectable({
@@ -11,14 +12,11 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
-
-  private apiUrl = 'http://localhost:3000/auth';
-
-  private loggedIn = new BehaviorSubject<boolean>(this.hasToken());
-  isLoggedIn$ = this.loggedIn.asObservable();
-
   private isBrowser: boolean;
-  
+
+  private apiUrl = `${environment.apiUrl}`;
+  private loggedIn = new BehaviorSubject<boolean>(false);
+  isLoggedIn$ = this.loggedIn.asObservable();
 
   constructor() {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -34,12 +32,8 @@ export class AuthService {
     return false;
   }
 
-  registerLojista(lojistaData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/lojista/register`, lojistaData);
-  }
-
   login(credentials: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/lojista/login`, credentials).pipe(
+    return this.http.post<any>(`${this.apiUrl}/lojistas/login`, credentials).pipe(
       tap((response) => {
         if (this.isBrowser && response && response.access_token) {
           localStorage.setItem('lojista_token', response.access_token);
@@ -47,7 +41,7 @@ export class AuthService {
         }
       })
     );
-  }
+}
 
   logout(): void {
     if (this.isBrowser) {
@@ -55,6 +49,10 @@ export class AuthService {
       this.loggedIn.next(false);
       this.router.navigate(['/card-login']);
     }
+  }
+
+  registerLojista(lojistaData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/lojistas/register`, lojistaData);
   }
 
   getToken(): string | null {

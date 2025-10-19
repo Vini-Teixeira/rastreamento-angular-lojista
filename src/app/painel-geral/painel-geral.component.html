@@ -1,53 +1,7 @@
-<header>
-  <div class="icone-text-header">
-    <img ngSrc="assets/icone.png" width="18" height="18" priority />
-    <span class="text-header">Rastreamento de entregas</span>
-  </div>
-
-  <div class="nova-entrega-perfil">
-    <button class="btn-nova-entrega">Nova entrega</button>
-    <button class="profile">
-      <img ngSrc="assets/profile.png" width="24" height="24" />
-    </button>
-  </div>
-</header>
-
-<aside class="sidebar" [class.collapsed]="!sidebarVisible">
-  <span class="btn-close" (click)="toggleSidebar()">X</span>
-  <span class="btn-reabrir-sidebar" (click)="toggleSidebar()">☰</span>
-  <nav>
-    <ul>
-      <li><a routerLink="/painel-geral" routerLinkActive="active" ariaCurrentWhenActive="page">Painel</a></li>
-      <hr />
-      <li><a routerLink="/relatorio-entregas" routerLinkActive="active" ariaCurrentWhenActive="page">Relatório de Entregas</a></li>
-      <hr />
-      <li><a routerLink="/entregadores" routerLinkActive="active" ariaCurrentWhenActive="page">Entregadores</a></li>
-    </ul>
-  </nav>
-</aside>
-
-<main>
-
-  <div class="map-wrapper"> 
-    <div class="mapa-container">
-      <app-mapa></app-mapa>
-    </div>
-    <app-dados-entrega
-      [valorEntrega]="detalhesEntrega.valor ?? null"
-      [nomeEntregador]="detalhesEntrega.entregador?.nome ?? null"
-      [enderecoOrigem]="detalhesEntrega.origem?.endereco ?? null"
-      [enderecoDestino]="detalhesEntrega.destino?.endereco ?? null"
-      [statusEntrega]="detalhesEntrega.status ?? null"
-      *ngIf="detalhesEntrega"
-    ></app-dados-entrega>
-    
-  </div>
-
-  <div *ngFor="let entrega of entregas">
-    <p>Entrega: {{ entrega.id }}</p>
-    <p>Entregador: {{ entrega.entregadorId }}</p>
-    <p>Destino: {{ entrega.lat }}, {{ entrega.lng }}</p>
-  </div>
-</main>
-
-<footer>© 2025 Vinicius Teixeira. Todos os direitos reservados.</footer>
+<div class="painel-wrapper">
+  <app-sidebar class="sidebar-container"></app-sidebar>
+  
+  <main class="content-container">
+    <router-outlet></router-outlet>
+  </main>
+</div>

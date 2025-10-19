@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -57,7 +57,7 @@ export class CardLoginComponent {
       )
       .subscribe({
         next: () => {
-          this.router.navigate(['/painel-geral']);
+          this.router.navigate(['/painel']);
         },
         error: (err) => {
           this.errorMessage = err.error?.message || 'Ocorreu um erro. Tente novamente.';

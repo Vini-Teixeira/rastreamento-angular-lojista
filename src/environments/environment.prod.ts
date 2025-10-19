@@ -1,4 +1,5 @@
 export const environment = {
-  production: false,
+  production: true,
+  apiUrl: 'https://rastreamento.entregas.com',
   googleMapsApiKey: 'AIzaSyAsfBKGYP5fEfpFvz-ymeXiCoGRvqbsn-M'
 };

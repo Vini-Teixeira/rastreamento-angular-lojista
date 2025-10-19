@@ -1,0 +1,57 @@
+:host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background-color: #ffffff;
+  height: 60px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.app-title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 1.2em;
+  color: #34495e;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.btn-nova-entrega {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #3498db; 
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  text-decoration: none; 
+
+  &:hover {
+    background-color: #2980b9; 
+  }
+
+  &:active {
+    transform: scale(0.98); 
+  }
+}
+
+.profile-icon {
+  font-size: 24px;
+  cursor: pointer;
+}

@@ -1,0 +1,82 @@
+<div class="table-wrapper">
+  <div *ngIf="isLoading" class="loading-shade">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Carregando entregas...</p>
+  </div>
+
+  <div *ngIf="error && !isLoading" class="error-message">
+    <p>{{ error }}</p>
+    <button mat-flat-button color="primary" (click)="carregarDadosIniciais()">
+      Tentar Novamente
+    </button>
+  </div>
+
+  <div class="table-container" [hidden]="isLoading || error">
+    <table mat-table [dataSource]="dataSource" matSort>
+      <!-- Coluna Status -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <td mat-cell *matCellDef="let element">
+          <span class="status-badge status-{{ element.status }}">
+            {{ element.status | titlecase }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Coluna Item -->
+      <ng-container matColumnDef="itemDescription">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Item</th>
+        <td mat-cell *matCellDef="let element">
+          <div class="item-description">{{ element.itemDescription }}</div>
+
+          <div *ngIf="element.codigoEntrega" class="delivery-code">
+            Cód: {{ element.codigoEntrega }}
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Coluna Destino -->
+      <ng-container matColumnDef="destination">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Destino</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.destination?.address }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Ações</th>
+        <td mat-cell *matCellDef="let element">
+          <button
+            mat-icon-button
+            (click)="selecionarEntrega(element)"
+            matTooltip="Ver no mapa"
+          >
+            <mat-icon>visibility</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            (click)="abrirModalDetalhes(element)"
+            matTooltip="Ver detalhes completos"
+          >
+            <mat-icon>info_outline</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="selecionarParaMapa(row)"
+        class="delivery-row"
+      ></tr>
+    </table>
+
+    <mat-paginator
+      [pageSizeOptions]="[5, 10, 20]"
+      showFirstLastButtons
+      aria-label="Selecione a página de entregas"
+    >
+    </mat-paginator>
+  </div>
+</div>

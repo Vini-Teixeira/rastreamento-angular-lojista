@@ -1,23 +1,39 @@
-<div class="status-container">
-    <h3>Detalhes da Entrega</h3>
-    <div class="status-item">
-      <span class="label">Valor:</span>
-      <span class="value">{{ valorEntrega | currency:'BRL':'symbol':'1.2-2' }}</span>
-    </div>
-    <div class="status-item">
-      <span class="label">Entregador:</span>
-      <span class="value">{{ nomeEntregador || 'Não atribuído' }}</span>
-    </div>
-    <div class="status-item">
-      <span class="label">Origem:</span>
-      <span class="value">{{ enderecoOrigem || 'Não definido' }}</span>
-    </div>
-    <div class="status-item">
-      <span class="label">Destino:</span>
-      <span class="value">{{ enderecoDestino || 'Não definido' }}</span>
-    </div>
-    <div class="status-item">
-      <span class="label">Status:</span>
-      <span class="value">{{ statusEntrega || 'Aguardando' }}</span>
-    </div>
-    </div>
+<div class="modal-header">
+  <h2 mat-dialog-title>Detalhes da Entrega</h2>
+  <button mat-icon-button [mat-dialog-close]="true">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="modal-content">
+  <div class="detail-item">
+    <span class="label">Destino:</span>
+
+    <span class="value">{{ entrega.destination?.address }}</span>
+  </div>
+</mat-dialog-content>
+
+<div class="detail-item">
+  <span class="label">Item:</span>
+  <span class="value">{{ entrega.itemDescription }}</span>
+</div>
+
+<div *ngIf="entrega.codigoEntrega" class="detail-item">
+  <span class="label">Código de Confirmação:</span>
+  <span class="value code">{{ entrega.codigoEntrega }}</span>
+</div>
+
+<mat-dialog-actions align="end">
+  <div
+    *ngIf="
+      (entrega.status === 'accepted' || entrega.status === 'on_the_way') &&
+      !entrega.checkInLiberadoManualmente
+    "
+  >
+    <button mat-stroked-button color="accent" (click)="onLiberarCheckIn()">
+      <mat-icon>lock_open</mat-icon>
+
+      Liberar Check-In Manualmente
+    </button>
+  </div>
+</mat-dialog-actions>

@@ -5,9 +5,7 @@
       <p class="subtitle">Acesse o painel da sua loja.</p>
     </div>
 
-    <!-- 1. Conectamos o evento (ngSubmit) do formulário ao nosso método onSubmit() -->
     <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <!-- Campo de Email -->
       <div class="form-group">
         <label for="email">Email</label>
         <input
@@ -19,7 +17,6 @@
         />
       </div>
 
-      <!-- Campo de Senha -->
       <div class="form-group">
         <label for="password">Senha</label>
         <div class="password-container">
@@ -38,12 +35,10 @@
         <a class="forgot-password" routerLink="/esqueceu-senha">Esqueceu sua senha?</a>
       </div>
       
-      <!-- 2. Mensagem de Erro Condicional -->
       <div *ngIf="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
 
-      <!-- 3. Botão de Login com estado de loading -->
       <button class="btn-login" type="submit" [disabled]="loginForm.invalid || isLoading">
         <span *ngIf="!isLoading">Entrar</span>
         <div *ngIf="isLoading" class="spinner"></div>
@@ -52,7 +47,6 @@
 
     <div class="divider"><span>ou</span></div>
 
-    <!-- Botão de Login com Google (funcionalidade futura) -->
     <button type="button" class="btn-google">
       <img ngSrc="assets/google.png" width="20" height="20" alt="Google logo" />
       Entrar com Google

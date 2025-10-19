@@ -1,77 +1,64 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core'; // 1. Importar inject
-import { RouterLink } from '@angular/router';
-import { Observable } from 'rxjs'; // 2. Importar Observable
-import { EntregasService } from '../services/entregas.service';
+import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, inject } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { ListaEntregasComponent } from '../entregas/lista-entregas/lista-entregas.component';
 import { MapaComponent } from '../mapa/mapa.component';
-import { DadosEntregaComponent } from '../dados-entrega/dados-entrega.component';
-import { MapLoaderService } from '../services/map-loader.service'; // 3. Importar o novo serviço
-
-interface DetalhesEntrega {
-  valor?: number | null;
-  entregador?: { nome?: string | null } | null;
-  origem?: { endereco?: string | null } | null;
-  destino?: { endereco?: string | null } | null;
-  status?: string | null;
-}
+import { SocketService } from '../services/socket.service';
+import { RouterModule } from '@angular/router';
+import { SidebarComponent } from '../layout/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-painel-geral',
-  standalone: true, // Garante que o componente seja standalone
+  standalone: true,
   imports: [
-    CommonModule,
-    NgOptimizedImage,
-    RouterLink,
+    CommonModule, 
     MapaComponent,
-    DadosEntregaComponent,
+    RouterModule,
+    ListaEntregasComponent,
+    SidebarComponent
   ],
   templateUrl: './painel-geral.component.html',
-  styleUrl: './painel-geral.component.scss',
+  styleUrls: ['./painel-geral.component.scss'],
 })
-export class PainelGeralComponent implements OnInit {
-  // Injeção de dependências moderna
-  public entregasService = inject(EntregasService);
-  private mapLoaderService = inject(MapLoaderService); // 4. Injetar o MapLoaderService
+export class PainelGeralComponent implements OnDestroy {
+  private socketService = inject(SocketService);
+  private locationSub: Subscription;
+  
+  public entregaSelecionada: any | null = null;
+  private idSalaAtual: string | null = null;
 
-  // 5. Criar um Observable para controlar a visibilidade do mapa
-  public isApiLoaded$: Observable<boolean>;
-
-  sidebarVisible = false;
-  entregas: any[] = [];
-  detalhesEntrega: DetalhesEntrega | null = null;
+  sidebarVisible = false
 
   constructor() {
-    // 6. Atribuir o Observable do serviço à nossa propriedade local
-    this.isApiLoaded$ = this.mapLoaderService.apiLoaded$;
-  }
+    this.locationSub = this.socketService.locationUpdated$.subscribe(update => {
+      if (update && this.entregaSelecionada && update.deliveryId === this.entregaSelecionada._id) {
+        
+        const novaEntrega = { ...this.entregaSelecionada };
+        novaEntrega.driverCurrentLocation = update.location;
+        this.entregaSelecionada = novaEntrega;
 
-  ngOnInit(): void {
-    // A lógica para buscar entregas permanece a mesma.
-    // O HttpInterceptor cuidará da autenticação automaticamente.
-    this.entregasService.listarEntregas().subscribe((data) => {
-      this.entregas = data;
+        console.log('Painel Geral: Posição do entregador atualizada no mapa!');
+      }
     });
   }
 
-  buscarDetalhesEntrega(idEntrega: string): void {
-    this.entregasService.obterDetalhesEntregaEspecifica(idEntrega).subscribe({
-      next: (data) => {
-        this.detalhesEntrega = {
-          valor: data?.valor,
-          entregador: data?.entregador,
-          origem: data?.origem,
-          destino: data?.destino,
-          status: data?.status,
-        };
-      },
-      error: (error) => {
-        console.error('Erro ao buscar detalhes da entrega:', error);
-        this.detalhesEntrega = null;
-      },
-    });
+  onEntregaSelecionada(entrega: any): void {
+    if (this.idSalaAtual) {
+      this.socketService.leaveDeliveryRoom(this.idSalaAtual);
+    }
+
+    this.entregaSelecionada = entrega;
+    if (this.entregaSelecionada?._id) {
+      this.idSalaAtual = this.entregaSelecionada._id;
+      this.socketService.joinDeliveryRoom(this.idSalaAtual!);
+    }
   }
 
-  toggleSidebar() {
-    this.sidebarVisible = !this.sidebarVisible;
+  ngOnDestroy(): void {
+    this.locationSub?.unsubscribe();
+    if (this.idSalaAtual) {
+      this.socketService.leaveDeliveryRoom(this.idSalaAtual);
+    }
   }
 }
+

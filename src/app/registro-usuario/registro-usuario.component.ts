@@ -9,7 +9,7 @@ import {
   ValidationErrors,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -35,10 +35,11 @@ export class RegistroUsuarioComponent {
       {
         nomeCompleto: ['', [Validators.required, Validators.minLength(3)]],
         email: ['', [Validators.required, Validators.email]],
+        endereco: ['', [Validators.required, Validators.minLength(10)]],
         password: ['', [Validators.required, Validators.minLength(6)]],
         confirmarSenha: ['', [Validators.required]],
       },
-      { validators: this.senhasCombinam } 
+      { validators: this.senhasCombinam }
     );
   }
 
@@ -57,24 +58,22 @@ export class RegistroUsuarioComponent {
     this.errorMessage = null;
     this.successMessage = null;
 
-    const lojistaData = {
-      nomeCompleto: this.registroForm.value.nomeCompleto,
-      email: this.registroForm.value.email,
-      password: this.registroForm.value.password,
-    };
+    const lojistaData = this.registroForm.value;
 
     this.authService
       .registerLojista(lojistaData)
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: () => {
-          this.successMessage = 'Registro realizado com sucesso! Redirecionando para o login...';
+          this.successMessage =
+            'Registro realizado com sucesso! Redirecionando para o login...';
           setTimeout(() => {
             this.router.navigate(['/card-login']);
           }, 2000);
         },
         error: (err) => {
-          this.errorMessage = err.error?.message || 'Ocorreu um erro no registro.';
+          this.errorMessage =
+            err.error?.message || 'Ocorreu um erro no registro.';
         },
       });
   }

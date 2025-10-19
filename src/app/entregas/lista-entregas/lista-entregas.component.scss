@@ -1,0 +1,116 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block; 
+  --font-title: 'Montserrat', sans-serif;
+  --font-data: 'Inter', sans-serif;
+
+  --status-pending: #f39c12; 
+  --status-on_the_way: #3498db; 
+  --status-delivered: #27ae60; 
+  --status-cancelled: #e74c3c; 
+  --status-accepted: #9b59b6; 
+}
+
+.item-description {
+  font-weight: 500;
+}
+
+.delivery-code {
+  font-size: 0.8em;
+  color: #a0a0a0;
+  margin-top: 4px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto; 
+  background-color: var(--card-background); 
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  color: var(--text-color);
+}
+
+.mat-elevation-z8 {
+  box-shadow: none; 
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse; 
+}
+
+.mat-header-cell {
+  background-color: #f0f3f6; 
+  color: #555; 
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 0.9em;
+  padding: 12px 16px;
+  text-align: left; 
+  border-bottom: 2px solid #e0e0e0; 
+}
+
+.mat-cell {
+  font-family: var(--font-data);
+  font-weight: 400;
+  font-size: 0.85em;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0; 
+  color: var(--text-color);
+}
+
+.mat-row {
+  &:hover {
+    background-color: #f8f8f8; 
+    cursor: pointer; 
+  }
+  &:nth-child(even) {
+    background-color: #fcfcfc;
+  }
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: capitalize; 
+  color: white; 
+  min-width: 80px;
+  text-align: center;
+}
+
+.status-badge.status-pending {
+  background-color: var(--status-pending);
+}
+.status-badge.status-on_the_way {
+  background-color: var(--status-on_the_way);
+}
+.status-badge.status-delivered {
+  background-color: var(--status-delivered);
+}
+.status-badge.status-cancelled {
+  background-color: var(--status-cancelled);
+}
+.status-badge.status-accepted {
+  background-color: var(--status-accepted);
+}
+
+button.mat-icon-button {
+  color: #7f8c8d; 
+  &:hover {
+    color: var(--status-on_the_way); 
+  }
+}
+
+mat-paginator {
+  background-color: var(--card-background);
+  color: var(--text-color);
+  font-family: var(--font-data);
+  border-top: 1px solid #e0e0e0;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+}

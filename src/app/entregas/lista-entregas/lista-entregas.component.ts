@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 import { PainelEstadoService } from '../../services/painel-estado.service';
 import { EntregasService, Delivery } from '../../services/entregas.service';
 import { SocketService } from '../../services/socket.service';
-import { DadosEntregaComponent } from '../../dados-entrega/dados-entrega.component';
+
 
 @Component({
   selector: 'app-lista-entregas',
@@ -101,24 +101,5 @@ export class ListaEntregasComponent implements OnInit, OnDestroy {
   selecionarParaMapa(entrega: any): void {
     this.entregaSelecionadaParaMapa.emit(entrega);
   }
-
-  abrirModalDetalhes(entrega: Delivery): void { 
-  const dialogRef = this.dialog.open(DadosEntregaComponent, {
-    width: '500px',
-    panelClass: 'custom-dialog-container',
-    data: entrega 
-  });
-
-  dialogRef.afterClosed().subscribe((resultado: Delivery | undefined) => { 
-    if (resultado) {
-      const index = this.dataSource.data.findIndex(d => d._id === resultado._id);
-      if (index > -1) {
-        const data = [...this.dataSource.data];
-        data[index] = resultado;
-        this.dataSource.data = data;
-      }
-    }
-  }); 
-}
 }
 

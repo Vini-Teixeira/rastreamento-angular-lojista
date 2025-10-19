@@ -20,7 +20,7 @@ import {
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './create-delivery.component.html',
-  styleUrls: ['./create-delivery.component.css'],
+  styleUrls: ['./create-delivery.component.scss'],
 })
 export class CreateDeliveryComponent implements OnInit {
   deliveryForm!: FormGroup;

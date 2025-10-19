@@ -6,6 +6,7 @@ import { MapaComponent } from '../mapa/mapa.component';
 import { SocketService } from '../services/socket.service';
 import { RouterModule } from '@angular/router';
 import { SidebarComponent } from '../layout/sidebar/sidebar.component';
+import { DashboardLojistaComponent } from '../dashboard/dashboard-lojista/dashboard-lojista.component';
 
 @Component({
   selector: 'app-painel-geral',
@@ -15,7 +16,8 @@ import { SidebarComponent } from '../layout/sidebar/sidebar.component';
     MapaComponent,
     RouterModule,
     ListaEntregasComponent,
-    SidebarComponent
+    SidebarComponent,
+    DashboardLojistaComponent
   ],
   templateUrl: './painel-geral.component.html',
   styleUrls: ['./painel-geral.component.scss'],

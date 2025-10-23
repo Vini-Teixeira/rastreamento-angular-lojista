@@ -3,9 +3,8 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  min-height: 100%;
   width: 100%;
-  overflow: hidden; 
   font-family: 'Inter', sans-serif; 
 }
 
@@ -39,5 +38,5 @@ html {
     padding: 0px;
     box-sizing: border-box;
 }
-html, body { height: 100%; }
+html, body { min-height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

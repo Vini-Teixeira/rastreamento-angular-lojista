@@ -6,50 +6,37 @@
     </div>
 
     <form class="login-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="seu.email@loja.com"
-          [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
-        />
-      </div>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="seu.email@loja.com">
+      </mat-form-field>
 
-      <div class="form-group">
-        <label for="password">Senha</label>
-        <div class="password-container">
-          <input
-            id="password"
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="••••••••"
-            [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-          />
-          <span class="toggle-password" (click)="togglePasswordVisibility()">
-            <img *ngIf="!showPassword" ngSrc="assets/olho-senha-aberta.png" width="24" height="24" alt="Mostrar senha" />
-            <img *ngIf="showPassword" ngSrc="assets/olho-senha-bloqueada.png" width="24" height="24" alt="Ocultar senha" />
-          </span>
-        </div>
-        <a class="forgot-password" routerLink="/esqueceu-senha">Esqueceu sua senha?</a>
-      </div>
+      <mat-form-field appearance="outline">
+        <mat-label>Senha</mat-label>
+        <input matInput [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder="••••••••">
+        <button mat-icon-button matSuffix (click)="togglePasswordVisibility()" type="button">
+          <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <a class="forgot-password" routerLink="/esqueceu-senha">Esqueceu sua senha?</a>
       
       <div *ngIf="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
 
-      <button class="btn-login" type="submit" [disabled]="loginForm.invalid || isLoading">
+      <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || isLoading">
         <span *ngIf="!isLoading">Entrar</span>
-        <div *ngIf="isLoading" class="spinner"></div>
+        <mat-progress-spinner *ngIf="isLoading" mode="indeterminate" diameter="24"></mat-progress-spinner>
       </button>
     </form>
 
     <div class="divider"><span>ou</span></div>
 
-    <button type="button" class="btn-google">
+    <button mat-stroked-button type="button" class="btn-google">
       <img ngSrc="assets/google.png" width="20" height="20" alt="Google logo" />
-      Entrar com Google
+      <span>Entrar com Google</span>
     </button>
     
     <div class="register-link">

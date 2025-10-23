@@ -9,6 +9,11 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
 import { finalize } from 'rxjs';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-card-login',
@@ -18,6 +23,11 @@ import { finalize } from 'rxjs';
     ReactiveFormsModule,
     NgOptimizedImage,
     RouterLink,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './card-login.component.html',
   styleUrl: './card-login.component.scss',

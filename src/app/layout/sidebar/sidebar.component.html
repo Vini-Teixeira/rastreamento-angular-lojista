@@ -5,21 +5,16 @@
   </button>
 
   <mat-nav-list>
-    <a mat-list-item routerLink="/painel/geral" routerLinkActive="active-link">
-      <mat-icon>dashboard</mat-icon>
-      <span class="text">Dashboard</span>
-    </a>
-    <a mat-list-item routerLink="/painel/nova-entrega" routerLinkActive="active-link">
-      <mat-icon>add_circle_outline</mat-icon>
-      <span class="text">Nova Entrega</span>
-    </a>
-    <a mat-list-item routerLink="/painel/lista-entregas" routerLinkActive="active-link">
-      <mat-icon>list_alt</mat-icon>
-      <span class="text">Lista de Entregas</span>
-    </a>
-    <a mat-list-item routerLink="/painel/solicitar-socorro" routerLinkActive="active-link">
-      <mat-icon>sos</mat-icon>
-      <span class="text">Solicitar Socorro</span>
-    </a>
+  <a mat-list-item routerLink="/painel/geral" routerLinkActive="active-link">
+    <mat-icon>dashboard</mat-icon>
+    <span class="text">Dashboard</span>
+  </a>
   </mat-nav-list>
+
+<div class="logout-section">
+  <a mat-list-item (click)="logout()">
+    <mat-icon>exit_to_app</mat-icon>
+    <span class="text">Sair</span>
+  </a>
+</div>
 </aside>

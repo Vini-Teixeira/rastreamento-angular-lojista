@@ -1,5 +1,5 @@
 <app-header></app-header>
-<app-sidebar></app-sidebar>
+<app-sidebar (collapsedChange)="onSidebarToggle($event)"></app-sidebar>
 
 <main class="content-area" [class.collapsed]="isSidebarCollapsed">
   <router-outlet></router-outlet>

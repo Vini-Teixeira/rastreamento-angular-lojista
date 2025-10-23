@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -10,16 +10,22 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-registro-usuario',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, MatFormFieldModule, MatInputModule,
+    MatButtonModule, MatProgressSpinnerModule
+  ],
   templateUrl: './registro-usuario.component.html',
   styleUrl: './registro-usuario.component.scss',
 })
-export class RegistroUsuarioComponent {
+export class RegistroUsuarioComponent  implements OnInit {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
@@ -28,12 +34,15 @@ export class RegistroUsuarioComponent {
   errorMessage: string | null = null;
   successMessage: string | null = null;
 
-  registroForm: FormGroup;
+  registroForm!: FormGroup
 
-  constructor() {
+  constructor() {}
+
+  ngOnInit(): void {
     this.registroForm = this.fb.group(
       {
-        nomeCompleto: ['', [Validators.required, Validators.minLength(3)]],
+        nomeFantasia: ['', [Validators.required, Validators.minLength(3)]],
+        cnpj: ['', [Validators.required, Validators.minLength(14), Validators.maxLength(18)]],
         email: ['', [Validators.required, Validators.email]],
         endereco: ['', [Validators.required, Validators.minLength(10)]],
         password: ['', [Validators.required, Validators.minLength(6)]],

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GoogleMapsModule, GoogleMap } from '@angular/google-maps';
 import { Observable, Subscription, filter, take, switchMap } from 'rxjs';
@@ -12,8 +12,9 @@ import { PainelEstadoService } from '../services/painel-estado.service';
   styleUrls: ['./mapa.component.scss'],
   imports: [GoogleMapsModule, CommonModule],
 })
-// 1. REMOVEMOS O 'OnChanges' DA LISTA DE IMPLEMENTAÇÕES
+
 export class MapaComponent implements OnInit, OnDestroy {
+  @Input() entrega: any;
   @ViewChild(GoogleMap) map!: GoogleMap;
 
   public apiLoaded$: Observable<boolean>;
@@ -36,24 +37,18 @@ export class MapaComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // 2. LÓGICA REATIVA E SEGURA
-    // Primeiro, esperamos a API do Google carregar (take(1) garante que isso aconteça só uma vez).
-    // Depois (usando switchMap), trocamos para ouvir as seleções de entrega.
     this.subscriptions.add(
       this.apiLoaded$.pipe(
         filter(loaded => loaded),
         take(1),
         switchMap(() => this.painelEstadoService.entregaSelecionada$)
       ).subscribe(entrega => {
-        // Esta parte só será executada se a API estiver carregada E uma entrega for selecionada.
         if (entrega) {
           this.atualizarMapaComEntrega(entrega);
         }
       })
     );
   }
-
-  // O MÉTODO ngOnChanges FOI REMOVIDO, POIS NÃO É MAIS NECESSÁRIO
 
   private atualizarMapaComEntrega(entrega: any): void {
     if (!entrega?.origin?.coordinates?.coordinates || !entrega?.destination?.coordinates?.coordinates) {

@@ -52,7 +52,7 @@ export class AuthService {
   }
 
   registerLojista(lojistaData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/lojistas/register`, lojistaData);
+    return this.http.post<any>(`${this.apiUrl}/lojistas`, lojistaData);
   }
 
   getToken(): string | null {

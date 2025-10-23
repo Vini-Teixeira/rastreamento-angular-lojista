@@ -1,0 +1,43 @@
+<div class="modal-header">
+  <h2 mat-dialog-title>Detalhes da Entrega</h2>
+  <button mat-icon-button [mat-dialog-close]="true" class="close-button">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="modal-content">
+  <div class="details-container">
+    <h4>Informações</h4>
+    <div class="info-item">
+      <span class="label">Status:</span>
+      <span class="value">{{ entrega.status }}</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Item:</span>
+      <span class="value">{{ entrega.itemDescription }}</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Código:</span>
+      <span class="value code">{{ entrega.codigoEntrega }}</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Origem:</span>
+      <span class="value">{{ entrega.origin.address }}</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Destino:</span>
+      <span class="value">{{ entrega.destination.address }}</span>
+    </div>
+    
+    <div class="actions" *ngIf="(entrega.status === 'aceito' || entrega.status === 'a_caminho') && !entrega.checkInLiberadoManualmente">
+      <button mat-stroked-button color="accent" (click)="onLiberarCheckIn()">
+        <mat-icon>lock_open</mat-icon>
+        Liberar Check-In
+      </button>
+    </div>
+  </div>
+
+  <div class="map-container">
+    <app-mapa [entrega]="entrega"></app-mapa>
+  </div>
+</mat-dialog-content>

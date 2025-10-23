@@ -1,7 +1,7 @@
 <div class="register-container">
   <div class="register-card">
     <div class="card-header">
-      <h1 class="title">Crie sua Conta</h1>
+      <h1 class="title">Crie a sua Conta</h1>
       <p class="subtitle">É rápido e fácil.</p>
     </div>
 
@@ -12,76 +12,47 @@
       {{ errorMessage }}
     </div>
 
-    <form
-      class="register-form"
-      [formGroup]="registroForm"
-      (ngSubmit)="onSubmit()"
-    >
-      <div class="form-group">
-        <label for="nomeCompleto">Nome Completo</label>
-        <input
-          id="nomeCompleto"
-          type="text"
-          formControlName="nomeCompleto"
-          placeholder="Seu nome completo"
-        />
-      </div>
+    <form class="register-form" [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Nome da Loja (Fantasia)</mat-label>
+        <input matInput formControlName="nomeFantasia" placeholder="O nome da sua loja">
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>CNPJ</mat-label>
+        <input matInput formControlName="cnpj" placeholder="00.000.000/0000-00">
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="seu.email@loja.com">
+      </mat-form-field>
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="seu.email@loja.com"
-        />
-      </div>
+      <mat-form-field appearance="outline">
+        <mat-label>Endereço da Loja</mat-label>
+        <input matInput formControlName="endereco" placeholder="Endereço completo da sua loja">
+      </mat-form-field>
 
-      <div class="form-group">
-        <label for="endereco">Endereço da Loja</label>
-        <input id="endereco" type="text" formControlName="endereco" placeholder="Endereço completo da sua loja" />
-      </div>
+      <mat-form-field appearance="outline">
+        <mat-label>Senha</mat-label>
+        <input matInput type="password" formControlName="password" placeholder="Mínimo de 6 caracteres">
+      </mat-form-field>
 
-      <div class="form-group">
-        <label for="password">Senha</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          placeholder="Mínimo de 6 caracteres"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="confirmarSenha">Confirmar Senha</label>
-        <input
-          id="confirmarSenha"
-          type="password"
-          formControlName="confirmarSenha"
-          placeholder="Repita sua senha"
-        />
-        <div
-          *ngIf="
-            registroForm.hasError('senhasNaoCombinam') &&
-            registroForm.get('confirmarSenha')?.touched
-          "
-          class="error-text"
-        >
+      <mat-form-field appearance="outline">
+        <mat-label>Confirmar Senha</mat-label>
+        <input matInput type="password" formControlName="confirmarSenha" placeholder="Repita a sua senha">
+        <mat-error *ngIf="registroForm.hasError('senhasNaoCombinam')">
           As senhas não coincidem.
-        </div>
-      </div>
-
-      <button
-        class="btn-register"
-        type="submit"
-        [disabled]="registroForm.invalid || isLoading || successMessage"
-      >
+        </mat-error>
+      </mat-form-field>
+      
+      <button mat-raised-button color="primary" type="submit" [disabled]="registroForm.invalid || isLoading || successMessage">
         <span *ngIf="!isLoading">Criar Conta</span>
-        <div *ngIf="isLoading" class="spinner"></div>
+        <mat-progress-spinner *ngIf="isLoading" mode="indeterminate" diameter="24"></mat-progress-spinner>
       </button>
-    </form>
-
-    <div class="login-link">
+    
+    </form> <div class="login-link">
       <span>Já tem uma conta?</span>
       <a routerLink="/card-login">Faça o login</a>
     </div>

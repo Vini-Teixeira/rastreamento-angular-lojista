@@ -1,3 +1,5 @@
+@use 'variables' as vars;
+
 :host {
   position: fixed;
   top: 0;
@@ -10,48 +12,44 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 16px 0 24px;
   background-color: #ffffff;
   height: 60px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .app-title {
-  font-family: 'Montserrat', sans-serif;
+  font-family: vars.$font-stack;
   font-weight: 600;
-  font-size: 1.2em;
-  color: #34495e;
+  font-size: 1.25em;
+  color: vars.$text-dark;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
 }
 
-.btn-nova-entrega {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.9em;
+button[mat-stroked-button] {
   font-weight: 600;
-  color: #ffffff;
-  background-color: #3498db; 
-  border: none;
-  border-radius: 6px;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.1s ease;
-  text-decoration: none; 
+}
 
-  &:hover {
-    background-color: #2980b9; 
-  }
-
-  &:active {
-    transform: scale(0.98); 
-  }
+button[mat-raised-button] {
+  font-weight: 600;
 }
 
 .profile-icon {
-  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  
+  mat-icon {
+    font-size: 32px;
+    color: vars.$secondary;
+    height: 32px;
+    width: 32px;
+  }
 }

@@ -1,34 +1,26 @@
+@use 'variables' as vars; 
+
 :host {
   --sidebar-width: 220px;
   --sidebar-width-collapsed: 60px;
-  --sidebar-bg-color: #2c3e50;
-  --sidebar-text-color: #ecf0f1;
-  --link-active-bg: #34495e;
-  --link-hover-bg: #3b5268;
-  --primary-color: #3498db; 
+  --sidebar-bg-color: #ffffff;
+  --sidebar-text-color: #{vars.$text-dark};
+  --sidebar-text-secondary: #{vars.$text-secondary};
+  --link-active-bg: #{rgba(vars.$primary, 0.1)};
+  --link-hover-bg: #f8f9fa;
+  --primary-color: #{vars.$primary};
+  --border-color: #e0e0e0;
 }
 
 .sidebar {
-  width: var(--sidebar-width);
-  height: 100vh;
-  padding-top: 60px; 
-  background-color: var(--sidebar-bg-color);
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
+  width: 220px;
   transition: width 0.3s ease-in-out;
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
   overflow: hidden;
 
   &.collapsed {
-    width: var(--sidebar-width-collapsed);
-
-    .text {
-      display: none; 
-    }
-    .toggle-button {
-      justify-content: center;
-    }
+    width: 60px;
   }
 }
 
@@ -39,51 +31,52 @@
   width: 100%;
   height: 40px;
   padding: 0 15px;
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
   border: none;
-  color: var(--sidebar-text-color);
+  color: var(--sidebar-text-color); 
   font-size: 1.5em;
   cursor: pointer;
   transition: background-color 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--link-hover-bg);
   }
 }
 
-nav ul {
-  list-style: none;
-  padding: 20px 0;
-  margin: 0;
+mat-nav-list {
+  flex-grow: 1;
+  padding-top: 20px;
 }
 
-nav a {
-  display: flex;
-  align-items: center;
-  padding: 12px 18px;
-  text-decoration: none;
-  color: var(--sidebar-text-color);
-  font-family: 'Montserrat', sans-serif;
+a[mat-list-item] {
+  color: var(--sidebar-text-secondary);
+  font-family: vars.$font-stack;
   font-weight: 500;
-  white-space: nowrap; 
-  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  transition: all 0.2s ease;
 
-  .icon {
-    font-size: 1.2em;
-    margin-right: 15px;
-    width: 24px;
-    text-align: center;
+  mat-icon {
+    color: var(--sidebar-text-secondary);
+    transition: color 0.2s ease;
   }
   
   &:hover {
     background-color: var(--link-hover-bg);
+    color: var(--sidebar-text-color);
   }
 
-  &.active {
+  &.active-link {
     background-color: var(--link-active-bg);
-    font-weight: 700;
+    color: var(--primary-color);
+    font-weight: 600;
     
-    border-left: 4px solid var(--primary-color);
-    padding-left: 14px;
+    mat-icon {
+      color: var(--primary-color);
+    }
   }
+}
+
+.logout-section {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-color);
 }

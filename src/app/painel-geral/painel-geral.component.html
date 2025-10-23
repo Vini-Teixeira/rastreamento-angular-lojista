@@ -1,13 +1,9 @@
-<main class="dashboard-grid">
-  <div class="lista-container">
-    <app-lista-entregas (entregaSelecionada)="onEntregaSelecionada($event)"></app-lista-entregas>
-  </div>
-
+<div class="painel-geral-grid">
   <div class="dashboard-container">
     <app-dashboard-lojista></app-dashboard-lojista>
-
-    <div class="map-overlay" *ngIf="entregaSelecionada">
-      <app-mapa [entrega]="entregaSelecionada"></app-mapa>
-    </div>
   </div>
-</main>
+
+  <div class="lista-container">
+    <app-lista-entregas></app-lista-entregas>
+  </div>
+</div>

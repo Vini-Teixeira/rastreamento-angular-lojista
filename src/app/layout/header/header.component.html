@@ -1,11 +1,26 @@
 <header>
   <div class="header-left">
-    <span class="app-title">Rastreamento de Entregas</span>
+    <span class="app-title">Painel do Lojista</span>
   </div>
   <div class="header-right">
-    <button class="btn-nova-entrega" routerLink="/nova-entrega">
+    <button 
+      mat-stroked-button 
+      color="accent" 
+      routerLink="/painel/solicitar-socorro">
+      <mat-icon>sos</mat-icon>
+      Solicitar Socorro
+    </button>
+    
+    <button 
+      mat-raised-button 
+      color="primary" 
+      routerLink="/painel/nova-entrega">
+      <mat-icon>add</mat-icon>
       Nova Entrega
     </button>
-    <div class="profile-icon">👤</div>
+    
+    <div class="profile-icon">
+      <mat-icon>account_circle</mat-icon>
+    </div>
   </div>
 </header>

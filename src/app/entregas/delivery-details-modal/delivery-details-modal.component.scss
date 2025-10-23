@@ -1,0 +1,84 @@
+@use 'variables' as vars;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-family: vars.$font-stack;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  
+  h2[mat-dialog-title] {
+    color: vars.$text-dark;
+    font-weight: 600;
+  }
+}
+
+.modal-content {
+  display: flex;
+  gap: 24px;
+  flex-grow: 1;
+  overflow: hidden;
+  padding-top: 16px;
+}
+
+.details-container {
+  width: 30%;
+  overflow-y: auto;
+  padding-right: 16px;
+  
+  h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: vars.$text-dark;
+    border-bottom: 2px solid vars.$primary;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .info-item {
+    margin-bottom: 16px;
+  }
+
+  .label {
+    font-weight: 500;
+    color: vars.$text-secondary;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .value {
+    font-size: 16px;
+    color: vars.$text-dark;
+  }
+
+  .code {
+    font-weight: bold;
+    color: vars.$primary;
+    font-size: 1.2em;
+  }
+
+  .actions {
+    margin-top: 24px;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+
+    button[color="accent"] {
+      color: vars.$warning-dark;
+      border-color: vars.$warning;
+    }
+  }
+}
+
+.map-container {
+  width: 70%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}

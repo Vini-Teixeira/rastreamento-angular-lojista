@@ -5,7 +5,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { SocorrosService } from '../../services/socorro.service';
+import { SocorrosService, CreateSocorroPayload } from '../../services/socorro.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-solicitar-socorro',
@@ -28,6 +29,9 @@ export class SolicitarSocorroComponent implements OnInit {
   socorroForm!: FormGroup;
   isLoading = false;
 
+  successMessage: string | null = null
+  errorMessage: string | null = null
+
   ngOnInit(): void {
     this.socorroForm = this.fb.group({
       address: ['', [Validators.required, Validators.minLength(10)]],
@@ -36,11 +40,12 @@ export class SolicitarSocorroComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.socorroForm.invalid || this.isLoading) {
-      return;
-    }
+    if (this.socorroForm.invalid) return;
 
     this.isLoading = true;
+    this.successMessage = null
+    this.errorMessage = null
+
     const formValue = this.socorroForm.value;
 
     const payload = {
@@ -50,17 +55,15 @@ export class SolicitarSocorroComponent implements OnInit {
       serviceDescription: formValue.serviceDescription
     };
 
-    this.socorrosService.createSocorro(payload).subscribe({
+    this.socorrosService.createSocorro(payload).pipe(
+      finalize(() => this.isLoading = false)
+    ).subscribe({
       next: (response) => {
-        this.isLoading = false;
-        console.log('Socorro solicitado com sucesso!', response);
-        alert('Socorro solicitado com sucesso!');
+        this.successMessage = 'Socorro solicitado com sucesso! O entregador mais próximo será notificado.';
         this.socorroForm.reset();
       },
       error: (err) => {
-        this.isLoading = false;
-        console.error('Erro ao solicitar socorro', err);
-        alert(`Erro: ${err.error.message || 'Não foi possível solicitar o socorro.'}`);
+        this.errorMessage = err.error?.message || 'Não foi possível solicitar o socorro.';
       }
     });
   }

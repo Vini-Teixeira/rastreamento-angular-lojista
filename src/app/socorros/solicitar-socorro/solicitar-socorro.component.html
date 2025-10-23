@@ -2,6 +2,13 @@
   <h1>Solicitar Socorro</h1>
   <p>Insira os detalhes abaixo para despachar o entregador mais próximo.</p>
 
+  <div *ngIf="successMessage" class="message success-message">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="message error-message">
+    {{ errorMessage }}
+  </div>
+
   <form [formGroup]="socorroForm" (ngSubmit)="onSubmit()">
     <mat-form-field appearance="outline">
       <mat-label>Endereço do Cliente</mat-label>

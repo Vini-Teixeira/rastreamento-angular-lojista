@@ -1,21 +1,38 @@
+@use 'variables' as vars;
 
 :host {
-  display: block;
+  display: flex;
+  flex-direction: row;
   height: 100vh;
-  overflow: hidden; 
+  background: vars.$bg-gradient;
+}
+
+.sidebar {
+  width: 220px;
+  transition: width 0.3s ease-in-out;
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
+  overflow: hidden;
+
+  &.collapsed {
+    width: 60px;
+  }
 }
 
 .content-area {
-  position: relative;
-  margin-left: 220px;
-  height: calc(100vh - 60px); 
-  padding: 20px;
-  margin-top: 60px; 
-  transition: margin-left 0.3s ease-in-out;
-  
-  overflow: hidden; 
+  flex: 1;
+  display: flex;               
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  margin-top: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
 
-  &.collapsed {
-    margin-left: 60px; 
+  > * {
+    max-width: 1000px;
+    width: 100%;
   }
 }

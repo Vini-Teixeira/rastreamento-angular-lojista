@@ -1,10 +1,36 @@
-<div class="container">
+<div class="login-container">
+  <div class="login-card">
+    <div class="card-header">
+      <h1 class="title">Recuperar Senha</h1>
+      <p class="subtitle">Insira o seu email para redefinir a senha.</p>
+    </div>
 
-  <h1>Esqueceu sua senha?</h1>
+    <div *ngIf="successMessage" class="message success-message">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="message error-message">
+      {{ errorMessage }}
+    </div>
 
-  <label>Insira seu email ou telefone abaixo:</label>
-  <input id="recup-senha" type="text" />
+    <form class="login-form" [formGroup]="recuperarForm" (ngSubmit)="onSubmit()" *ngIf="!successMessage">
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="seu.email@loja.com">
+        <mat-error *ngIf="recuperarForm.get('email')?.hasError('email')">
+          Por favor, insira um email válido.
+        </mat-error>
+      </mat-form-field>
+      
+      <button mat-raised-button color="primary" type="submit" [disabled]="recuperarForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Enviar Link de Recuperação</span>
+        <mat-progress-spinner *ngIf="isLoading" mode="indeterminate" diameter="24"></mat-progress-spinner>
+      </button>
+    </form>
 
-  <button class="btn-enviar-nova-senha">Enviar nova senha</button>
-
+    <div class="login-link">
+      <span>Lembrou da senha?</span>
+      <a routerLink="/card-login">Volte para o login</a>
+    </div>
+  </div>
 </div>

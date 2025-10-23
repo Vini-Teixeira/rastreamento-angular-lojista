@@ -1,54 +1,43 @@
 <div class="form-container">
   <h2>Solicitar Nova Entrega</h2>
-  <p>Preencha os dados abaixo para encontrar o entregador mais próximo.</p>
 
   <form [formGroup]="deliveryForm" (ngSubmit)="onSubmit()">
     
-    <div class="form-field">
-  <label for="destinationAddress">Endereço de Destino</label>
+    <mat-radio-group formControlName="deliveryType" class="delivery-type-group">
+      <mat-radio-button value="propria">Entrega Própria</mat-radio-button>
+      <mat-radio-button value="parceira">Retirar em Outra Loja</mat-radio-button>
+    </mat-radio-group>
 
-  <div class="input-with-button">
-    <input 
-      id="destinationAddress" 
-      type="text" 
-      formControlName="destinationAddress"
-      placeholder="Rua, Número, Bairro, Cidade - Ponto de Referência">
-    
-    <button type="button" (click)="validateAddress()" [disabled]="isGeocoding">
-      <span *ngIf="!isGeocoding">Validar</span>
-      <span *ngIf="isGeocoding" class="spinner-small"></span> </button>
-  </div>
-  
-  <div *ngIf="destinationAddress?.invalid && destinationAddress?.touched" class="error-message">
-    <small *ngIf="destinationAddress?.errors?.['required']">O endereço é obrigatório.</small>
-    <small *ngIf="destinationAddress?.errors?.['minlength']">O endereço parece curto demais.</small>
-  </div>
-</div>
+    <mat-form-field appearance="outline" *ngIf="deliveryForm.get('deliveryType')?.value === 'parceira'">
+      <mat-label>Loja de Origem</mat-label>
+      <mat-select formControlName="origemId" required>
+        <mat-option *ngFor="let loja of lojas$ | async" [value]="loja._id">
+          {{ loja.nomeFantasia }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="deliveryForm.get('origemId')?.hasError('required')">
+        Por favor, selecione a loja de origem.
+      </mat-error>
+    </mat-form-field>
 
-    <div class="form-field">
-      <label for="itemDescription">Descrição do Item</label>
-      <input 
-        id="itemDescription"
-        type="text"
-        formControlName="itemDescription"
-        placeholder="Ex: Bateria Moura M60AD">
+    <mat-form-field appearance="outline">
+      <mat-label>Endereço de Destino</mat-label>
+      <input matInput formControlName="destinationAddress" placeholder="Rua, Número, Bairro...">
+    </mat-form-field>
 
-      <div *ngIf="itemDescription?.invalid && itemDescription?.touched" class="error-message">
-        <small *ngIf="itemDescription?.errors?.['required']">A descrição é obrigatória.</small>
-      </div>
+    <mat-form-field appearance="outline">
+      <mat-label>Descrição do Item</mat-label>
+      <input matInput formControlName="itemDescription" placeholder="Ex: Bateria Moura M60AD">
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" type="submit" [disabled]="deliveryForm.invalid || isLoading">
+        <span *ngIf="!isLoading">Solicitar Entrega</span>
+        <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
+      </button>
     </div>
 
-    <button type="submit" [disabled]="deliveryForm.invalid || isLoading">
-      <span *ngIf="!isLoading">Solicitar Entrega</span>
-      <span *ngIf="isLoading">Procurando entregador...</span>
-    </button>
-
-    <div *ngIf="successMessage" class="success-message">
-      {{ successMessage }}
-    </div>
-    <div *ngIf="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-
+    <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
   </form>
 </div>

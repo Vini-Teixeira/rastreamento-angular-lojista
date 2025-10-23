@@ -14,12 +14,13 @@ export interface Delivery {
 }
 
 export interface CreateDeliveryPayload {
-  origin: {
+  origin?: {
     address: string;
     coordinates: { lat: number; lng: number; };
   };
   destination: { address: string; };
   itemDescription: string;
+  origemId?: string;
 }
 
 export interface ApiResponse {

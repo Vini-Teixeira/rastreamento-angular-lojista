@@ -1,9 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgxChartsModule } from '@swimlane/ngx-charts'; 
+import { NgxChartsModule, LegendPosition } from '@swimlane/ngx-charts';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LojistasService, DashboardSummary } from '../../services/lojistas.service';
-import { LegendPosition } from '@swimlane/ngx-charts';
+import { SocketService } from '../../services/socket.service'; 
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-lojista',
@@ -12,20 +13,31 @@ import { LegendPosition } from '@swimlane/ngx-charts';
   templateUrl: './dashboard-lojista.component.html',
   styleUrls: ['./dashboard-lojista.component.scss']
 })
-export class DashboardLojistaComponent implements OnInit {
+export class DashboardLojistaComponent implements OnInit, OnDestroy {
   private lojistasService = inject(LojistasService);
+  private socketService = inject(SocketService);
 
   legendPosition = LegendPosition.Below;
-
   chartData: { name: string, value: number }[] = [];
   isLoading = true;
   error: string | null = null;
-
   colorScheme: any = {
-    domain: ['#5AA454', '#FFC107', '#DC3545'] 
+    domain: ['#28A745', '#FFC107', '#DC3545']
   };
 
+  private updateSubscription!: Subscription;
+
   ngOnInit(): void {
+    this.fetchDashboardData();
+    this._listenForUpdates();
+  }
+
+  ngOnDestroy(): void {
+    this.updateSubscription?.unsubscribe();
+  }
+
+  private fetchDashboardData(): void {
+    this.isLoading = true;
     this.lojistasService.getDashboardSummary().subscribe({
       next: (summary: DashboardSummary) => {
         this.chartData = [
@@ -34,6 +46,7 @@ export class DashboardLojistaComponent implements OnInit {
           { name: 'Canceladas', value: summary.canceladas }
         ];
         this.isLoading = false;
+        this.error = null;
       },
       error: (err) => {
         this.error = 'Não foi possível carregar o resumo do dia.';
@@ -41,5 +54,14 @@ export class DashboardLojistaComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  private _listenForUpdates(): void {
+    this.updateSubscription = this.socketService.deliveryUpdated$.subscribe(
+      () => {
+        console.log('Dashboard: Atualização recebida via WebSocket! A buscar novos dados...');
+        this.fetchDashboardData();
+      }
+    );
   }
 }

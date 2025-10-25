@@ -29,11 +29,28 @@
       <span class="value">{{ entrega.destination.address }}</span>
     </div>
     
-    <div class="actions" *ngIf="(entrega.status === 'aceito' || entrega.status === 'a_caminho') && !entrega.checkInLiberadoManualmente">
-      <button mat-stroked-button color="accent" (click)="onLiberarCheckIn()">
+    <div class="actions">
+      
+      <button
+        mat-stroked-button
+        color="accent"
+        (click)="onLiberarCheckIn()"
+        *ngIf="(entrega.status === DeliveryStatus.ACEITO || entrega.status === DeliveryStatus.A_CAMINHO) && !entrega.checkInLiberadoManualmente"
+      >
         <mat-icon>lock_open</mat-icon>
         Liberar Check-In
       </button>
+
+      <button
+        mat-stroked-button
+        color="warn" 
+        (click)="onCancelarEntrega()"
+        *ngIf="entrega.status !== DeliveryStatus.FINALIZADO && entrega.status !== DeliveryStatus.CANCELADO"
+      >
+        <mat-icon>cancel</mat-icon>
+        Cancelar Entrega
+      </button>
+
     </div>
   </div>
 

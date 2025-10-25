@@ -58,5 +58,9 @@ export class EntregasService {
     const url = `${this.apiUrl}/${deliveryId}/liberar-checkin`
     return this.http.patch(url, {})
   }
+  cancelarEntrega(deliveryId: string): Observable<any> {
+    const url = `${this.apiUrl}/${deliveryId}/cancelar`;
+    return this.http.patch(url, {})
+  }
 }
 

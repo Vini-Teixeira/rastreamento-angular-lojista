@@ -24,6 +24,7 @@ import { PainelEstadoService } from '../../services/painel-estado.service';
 import { EntregasService, Delivery } from '../../services/entregas.service';
 import { SocketService } from '../../services/socket.service';
 import { DeliveryDetailsModalComponent } from '../delivery-details-modal/delivery-details-modal.component';
+import { FormatStatusPipe } from '../../shared/pipes/format-status.pipe';
 
 @Component({
   selector: 'app-lista-entregas',
@@ -38,6 +39,7 @@ import { DeliveryDetailsModalComponent } from '../delivery-details-modal/deliver
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatDialogModule,
+    FormatStatusPipe
   ],
   templateUrl: './lista-entregas.component.html',
   styleUrls: ['./lista-entregas.component.scss'],

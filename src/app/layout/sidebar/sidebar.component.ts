@@ -18,7 +18,7 @@ export class SidebarComponent {
   private authService = inject(AuthService)
   private router = inject(Router)
 
-  isCollapsed = false;
+  isCollapsed = true;
   @Output() collapsedChange = new EventEmitter<boolean>()
 
   toggleSidebar(): void {

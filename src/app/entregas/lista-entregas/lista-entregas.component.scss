@@ -1,4 +1,4 @@
-@use 'variables' as vars; // Importa as suas variáveis globais
+@use 'variables' as vars;
 
 :host {
   display: flex;
@@ -6,19 +6,13 @@
   height: 100%;
 }
 
-// Removemos as variáveis CSS antigas, pois agora usaremos as globais
-// --font-title: 'Montserrat', sans-serif;
-// --status-pending: #f39c12;
-// ... (etc.)
-
 .table-wrapper {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden; // Garante que o wrapper não transborde
+  overflow: hidden; 
 }
 
-// Estados de Carregamento e Erro
 .loading-shade,
 .error-message {
   display: flex;
@@ -35,26 +29,23 @@
   color: vars.$text-dark;
 }
 
-// Contentor da Tabela (para permitir rolagem interna)
 .table-container {
   flex-grow: 1;
-  overflow-y: auto; // Permite que a tabela role
+  overflow-y: auto;
 }
 
 table {
   width: 100%;
 }
 
-// Cabeçalho da Tabela
 .mat-header-cell {
-  background-color: vars.$bg-light; // Fundo cinza claro
-  color: vars.$text-secondary; // Cinza médio
+  background-color: vars.$bg-light;
+  color: vars.$text-secondary; 
   font-family: vars.$font-stack;
   font-weight: 600;
   font-size: 14px;
 }
 
-// Células da Tabela
 .mat-cell {
   font-family: vars.$font-stack;
   color: vars.$text-dark;
@@ -62,9 +53,8 @@ table {
   border-bottom-color: #f0f0f0;
 }
 
-// Linhas da Tabela
 .mat-row:hover {
-  background-color: rgba(vars.$primary, 0.05); // Um hover azul muito subtil
+  background-color: rgba(vars.$primary, 0.05); 
 }
 
 // Coluna do Item
@@ -78,24 +68,21 @@ table {
   margin-top: 4px;
 }
 
-// Coluna de Ações
 button.mat-icon-button {
   color: vars.$text-secondary;
   transition: color 0.2s ease;
   &:hover {
-    color: vars.$primary; // Fica azul ao passar o rato
+    color: vars.$primary;
   }
 }
 
-// PAGINATOR
 mat-paginator {
   background-color: #ffffff;
   color: vars.$text-secondary;
   font-family: vars.$font-stack;
-  flex-shrink: 0; // Garante que o paginator não encolha
+  flex-shrink: 0;
 }
 
-// --- AS NOSSAS "BADGES" DE STATUS ---
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -109,21 +96,18 @@ mat-paginator {
   text-align: center;
 }
 
-// Agora, mapeamos os status (em português) para as cores da sua paleta oficial
 .status-badge.status-pendente,
 .status-badge.status-aceito,
 .status-badge.status-a_caminho,
-.status-badge.status-instalando,
-.status-badge.status-no_local {
-  background-color: vars.$warning; // Amarelo
+.status-badge.status-em_atendimento {
+  background-color: vars.$warning;
   color: vars.$text-dark;
 }
 
-.status-badge.status-entregue,
-.status-badge.status-concluído {
-  background-color: vars.$success; // Verde
+.status-badge.status-finalizado {
+  background-color: vars.$success;
 }
 
 .status-badge.status-cancelado {
-  background-color: #e74c3c; // Vermelho (pode adicionar ao seu _variables.scss)
+  background-color: #e74c3c;
 }

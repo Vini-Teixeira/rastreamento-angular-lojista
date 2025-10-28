@@ -54,6 +54,9 @@ function decodePolyline(encoded: string): google.maps.LatLngLiteral[] {
 export class MapaComponent implements AfterViewInit {
   @ViewChild(GoogleMap) private mapInstanceRef!: GoogleMap;
   private mapInstance: google.maps.Map | undefined;
+
+  public historyPolylineOptions: google.maps.PolylineOptions | null = null;
+  public historyPolylinePath: google.maps.LatLngLiteral[] = [];
   
   public apiLoaded$: Observable<boolean>;
   private mapLoader = inject(MapLoaderService);
@@ -65,6 +68,24 @@ export class MapaComponent implements AfterViewInit {
     mapTypeControl: false,
     streetViewControl: false,
   };
+
+  public clearHistoryPolylines() {
+    this.historyPolylineOptions = null;
+    this.historyPolylinePath = [];
+    this.cdr.detectChanges();
+  }
+
+  public drawHistoryPolyline(path: google.maps.LatLngLiteral[], color: 'gray') {
+    this.historyPolylineOptions = {
+      path: path,
+      strokeColor: color,
+      strokeOpacity: 0.7,
+      strokeWeight: 9,
+      zIndex: 2
+    };
+    this.historyPolylinePath = path;
+    this.cdr.detectChanges();
+  }
 
   public staticMarkerPositions: google.maps.LatLngLiteral[] = [];
   public driverMarkerPosition: google.maps.LatLngLiteral | null = null;
@@ -94,15 +115,28 @@ export class MapaComponent implements AfterViewInit {
 
   public drawPolyline(
     polylineString: string,
-    color: 'orange' | 'blue' | 'green' | 'gray'
+    color: 'orange' | 'blue' | 'green' | 'gray' | 'lightskyblue', 
+    dotted: boolean = false
   ) {
     const path = decodePolyline(polylineString);
+    let icon: google.maps.Symbol | undefined = undefined;
+    if (dotted) {
+      icon = {
+        path: 'M 0,-1 0,1',
+        strokeOpacity: 1,
+        strokeWeight: 4,
+        scale: 4,
+      };
+    }
     this.polylineOptions.push({
       path: path,
       strokeColor: color,
-      strokeOpacity: color === 'gray' ? 0.8 : 1.2,
-      strokeWeight: color === 'gray' ? 6 : 8,
+      strokeOpacity: dotted ? 0 : 1.0,
+      strokeWeight: 8,
+      icons: dotted ? [{ icon: icon, offset: '0', repeat: '20px' }] : undefined,
+      zIndex: 1
     });
+    
     this.polylinePaths = this.polylineOptions.map(p => p.path as google.maps.LatLngLiteral[]);
     this.cdr.detectChanges();
   }
@@ -115,6 +149,7 @@ export class MapaComponent implements AfterViewInit {
   public clearDynamicElements() {
     this.polylineOptions = [];
     this.polylinePaths = [];
+    this.clearHistoryPolylines();
     this.cdr.detectChanges();
   }
 

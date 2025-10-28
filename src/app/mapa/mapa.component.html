@@ -22,6 +22,11 @@
       [options]="options"
     ></map-polyline>
 
+    <map-polyline
+      *ngIf="historyPolylineOptions"
+      [options]="historyPolylineOptions"
+    ></map-polyline>
+
   </google-map>
 </div>
 <ng-template #loading>

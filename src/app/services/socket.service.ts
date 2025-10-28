@@ -43,6 +43,7 @@ export class SocketService {
     
     this.socket.on('novaLocalizacao', (data: any) => {
       console.log('SocketService: Evento "novaLocalizacao" recebido!', data);
+      if (!data.routeHistory) console.warn('[SocketService] routeHistory ausente no payload!');
       this.locationUpdateSubject.next(data);
     });
   }

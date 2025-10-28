@@ -18,7 +18,10 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MapaComponent } from '../../mapa/mapa.component';
 import { Delivery, EntregasService } from '../../services/entregas.service';
 import { DeliveryStatus } from '../../core/enums/delivery-status.enum';
-import { GeocodingService, LatLng } from '../../services/geocoding/geocoding.service';
+import {
+  GeocodingService,
+  LatLng,
+} from '../../services/geocoding/geocoding.service';
 import { SocketService } from '../../services/socket.service';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -45,23 +48,35 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
   private socketService = inject(SocketService);
   private geocodingService = inject(GeocodingService);
-  private cdr = inject(ChangeDetectorRef); 
+  private cdr = inject(ChangeDetectorRef);
 
-  public dialogRef = inject(MatDialogRef<DeliveryDetailsModalComponent>)
-  public entrega: Delivery = inject(MAT_DIALOG_DATA)
+  public dialogRef = inject(MatDialogRef<DeliveryDetailsModalComponent>);
+  public entrega: Delivery = inject(MAT_DIALOG_DATA);
   @ViewChild(MapaComponent) private mapaComponent!: MapaComponent;
-  public DeliveryStatus = DeliveryStatus
-  private subscriptions = new Subscription()
+  public DeliveryStatus = DeliveryStatus;
+  private subscriptions = new Subscription();
 
-  private coordsLoja!: LatLng
-  private coordsCliente!: LatLng 
+  private coordsLoja!: LatLng;
+  private coordsCliente!: LatLng;
   private coordsEntregador: LatLng | null = null;
 
+  private localRouteHistory: LatLng[] = [];
+
+  private polylineRotaEntregadorLoja: string | null = null;
+  private polylineRotaLojaCliente: string | null = null;
+  private polylineRotaEntregadorCliente: string | null = null;
+
   ngOnInit(): void {
-    this.coordsLoja = this.getCoords(this.entrega.origin.coordinates.coordinates);
-    this.coordsCliente = this.getCoords(this.entrega.destination.coordinates.coordinates);
+    this.coordsLoja = this.getCoords(
+      this.entrega.origin.coordinates.coordinates
+    );
+    this.coordsCliente = this.getCoords(
+      this.entrega.destination.coordinates.coordinates
+    );
     if (this.entrega.driverCurrentLocation) {
-      this.coordsEntregador = this.getCoords(this.entrega.driverCurrentLocation.coordinates);
+      this.coordsEntregador = this.getCoords(
+        this.entrega.driverCurrentLocation.coordinates
+      );
     }
     this.socketService.joinDeliveryRoom(this.entrega._id);
     this.listenForUpdates();
@@ -79,28 +94,34 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
 
   private listenForUpdates(): void {
     const statusSub = this.socketService.deliveryUpdated$
-      .pipe(
-        filter(data => data && data.deliveryId === this.entrega._id)
-      )
-      .subscribe(data => {
+      .pipe(filter((data) => data && data.deliveryId === this.entrega._id))
+      .subscribe((data) => {
         console.log('STATUS ATUALIZADO (WS):', data.status);
         this.entrega.status = data.status;
         if (data.payload?.driverCurrentLocation) {
-           this.coordsEntregador = this.getCoords(data.payload.driverCurrentLocation.coordinates);
+          this.coordsEntregador = this.getCoords(
+            data.payload.driverCurrentLocation.coordinates
+          );
         }
         this.drawRouteByStatus(data.status);
         this.cdr.detectChanges();
       });
 
     const locationSub = this.socketService.locationUpdated$
-      .pipe(
-        filter(data => data && data.deliveryId === this.entrega._id)
-      )
-      .subscribe(data => {
-        console.warn('*** EVENTO DE LOCALIZAÇÃO RECEBIDO DO WS ***')
+      .pipe(filter((data) => data && data.deliveryId === this.entrega._id))
+      .subscribe((data) => {
         if (!data.location?.coordinates) return;
-        console.log('LOCALIZAÇÃO ATUALIZADA (WS):', data.location.coordinates);
+                console.log('[Angular] Payload WS [novaLocalizacao]:', data); 
+
         this.coordsEntregador = this.getCoords(data.location.coordinates);
+        if (data.routeHistory && Array.isArray(data.routeHistory)) {
+          console.log(`[Angular] HISTÓRICO RECEBIDO: Sim, ${data.routeHistory.length} pontos. Atualizando array local...`);
+          this.localRouteHistory = data.routeHistory.map((point: any) =>
+            this.getCoords(point.coordinates)
+          );
+        } else {
+          console.warn('[Angular] HISTÓRICO RECEBIDO: Não. O payload não continha um array routeHistory.');
+        }
         this.updateDynamicRoutes(this.entrega.status);
       });
 
@@ -121,54 +142,90 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
   private drawRouteByStatus(status: DeliveryStatus): void {
     if (!this.mapaComponent) return;
     this.mapaComponent.clearDynamicElements();
+    this.setStaticMarkers();
+    if (this.entrega.routeHistory && this.entrega.routeHistory.length > 0) {
+      this.localRouteHistory = this.entrega.routeHistory.map((p) =>
+        this.getCoords(p.coordinates)
+      );
+      this.mapaComponent.drawHistoryPolyline(this.localRouteHistory, 'gray');
+    }
     switch (status) {
       case DeliveryStatus.PENDENTE:
-        this.fetchAndDrawPolyline(this.coordsLoja, this.coordsCliente, 'orange');
+        this.fetchAndDrawPolyline(
+          this.coordsLoja,
+          this.coordsCliente,
+          'orange',
+          (polyline) => {
+            this.polylineRotaLojaCliente = polyline;
+          }
+        );
         break;
-
       case DeliveryStatus.ACEITO:
         if (this.coordsEntregador) {
           this.mapaComponent.updateDriverMarker(this.coordsEntregador);
-          this.fetchAndDrawPolyline(this.coordsEntregador, this.coordsLoja, 'blue');
-          this.fetchAndDrawPolyline(this.coordsLoja, this.coordsCliente, 'gray');
+          this.fetchAndDrawPolyline(
+            this.coordsEntregador,
+            this.coordsLoja,
+            'blue',
+            (polyline) => {
+              this.polylineRotaEntregadorLoja = polyline;
+            }
+          );
+          this.fetchAndDrawPolyline(
+            this.coordsLoja,
+            this.coordsCliente,
+            'lightskyblue',
+            (polyline) => {
+              this.polylineRotaLojaCliente = polyline;
+            },
+            true
+          );
         }
         break;
-
       case DeliveryStatus.A_CAMINHO:
       case DeliveryStatus.EM_ATENDIMENTO:
         if (this.coordsEntregador) {
           this.mapaComponent.updateDriverMarker(this.coordsEntregador);
-          this.fetchAndDrawPolyline(this.coordsEntregador, this.coordsCliente, 'green');
+          this.fetchAndDrawPolyline(
+            this.coordsEntregador,
+            this.coordsCliente,
+            'green',
+            (polyline) => {
+              this.polylineRotaEntregadorCliente = polyline;
+            }
+          );
         }
+        break;
+      case DeliveryStatus.FINALIZADO:
         break;
       default:
         break;
     }
-    this.setStaticMarkers();
   }
 
   private updateDynamicRoutes(status: DeliveryStatus): void {
     if (!this.mapaComponent || !this.coordsEntregador) return;
-    this.mapaComponent.clearDynamicElements(); 
     this.mapaComponent.updateDriverMarker(this.coordsEntregador);
-        if (status === DeliveryStatus.ACEITO) {
-      this.fetchAndDrawPolyline(this.coordsEntregador, this.coordsLoja, 'blue');
-      this.fetchAndDrawPolyline(this.coordsLoja, this.coordsCliente, 'gray');
-    } else if (status === DeliveryStatus.A_CAMINHO || status === DeliveryStatus.EM_ATENDIMENTO) {
-      this.fetchAndDrawPolyline(this.coordsEntregador, this.coordsCliente, 'green');
+    this.mapaComponent.clearHistoryPolylines(); 
+    if (this.localRouteHistory.length > 1) {
+      console.log(`[Angular] DESENHANDO HISTÓRICO com ${this.localRouteHistory.length} pontos.`);
+      this.mapaComponent.drawHistoryPolyline(this.localRouteHistory, 'gray');
     }
   }
 
   private fetchAndDrawPolyline(
     origin: LatLng,
     destination: LatLng,
-    color: 'orange' | 'blue' | 'green' | 'gray'
+    color: 'orange' | 'blue' | 'green' | 'lightskyblue',
+    callback: (polyline: string) => void,
+    dotted: boolean = false
   ): void {
     this.geocodingService.getDirections(origin, destination).subscribe({
       next: (response) => {
-        this.mapaComponent.drawPolyline(response.polyline, color);
+        this.mapaComponent.drawPolyline(response.polyline, color, dotted);
+        callback(response.polyline);
       },
-      error: (err) => console.error(`Erro ao buscar polyline ${color}:`, err)
+      error: (err) => console.error(`Erro ao buscar polyline ${color}:`, err),
     });
   }
 

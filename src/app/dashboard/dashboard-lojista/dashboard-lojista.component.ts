@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core'; // VOLTAMOS COM ONINIT/ONDESTROY
 import { CommonModule } from '@angular/common';
 import { NgxChartsModule, LegendPosition } from '@swimlane/ngx-charts';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { LojistasService, DashboardSummary } from '../../services/lojistas.service';
-import { SocketService } from '../../services/socket.service'; 
-import { Subscription } from 'rxjs';
+import { LojistasService, DashboardSummary } from '../../services/lojistas.service'; // VOLTAMOS COM ESSES
+import { SocketService } from '../../services/socket.service';
+import { Subscription } from 'rxjs'; // VOLTAMOS COM SUBSCRIPTION
 
 @Component({
   selector: 'app-dashboard-lojista',
@@ -60,7 +60,7 @@ export class DashboardLojistaComponent implements OnInit, OnDestroy {
     this.updateSubscription = this.socketService.deliveryUpdated$.subscribe(
       () => {
         console.log('Dashboard: Atualização recebida via WebSocket! A buscar novos dados...');
-        this.fetchDashboardData();
+        this.fetchDashboardData(); 
       }
     );
   }

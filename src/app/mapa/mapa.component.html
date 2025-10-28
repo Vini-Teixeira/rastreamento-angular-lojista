@@ -1,23 +1,29 @@
-<div class="map-container" *ngIf="apiLoaded$ | async">
-  <google-map height="100%" width="100%" [options]="mapOptions">
+<div *ngIf="apiLoaded$ | async; else loading" class="map-container">
+  
+  <google-map #mapInstance 
+    width="100%" 
+    height="100%" 
+    [options]="mapOptions">
+    
     <map-marker
-      *ngFor="let marker of markers"
-      [position]="marker.position"
-      [title]="marker.title"
-      [options]="marker.options"
-    >
-    </map-marker>
+      *ngFor="let pos of staticMarkerPositions; let i = index"
+      [position]="pos"
+      [options]="{ icon: i === 0 ? iconLoja : iconCliente }"
+    ></map-marker>
 
     <map-marker
-      *ngFor="let marker of markers"
-      [position]="marker.position"
-      [title]="marker.title"
-      [options]="marker.options"
+      *ngIf="driverMarkerPosition"
+      [position]="driverMarkerPosition"
+      [options]="{ icon: iconDriver, zIndex: 999 }"
     ></map-marker>
 
     <map-polyline
-      *ngFor="let polyline of polylines"
-      [options]="polyline"
+      *ngFor="let options of polylineOptions"
+      [options]="options"
     ></map-polyline>
+
   </google-map>
 </div>
+<ng-template #loading>
+  <div class="map-loading">Carregando mapa...</div>
+</ng-template>

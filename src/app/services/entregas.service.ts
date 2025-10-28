@@ -2,23 +2,38 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { DeliveryStatus } from '../core/enums/delivery-status.enum'; 
+
+export interface GeoJsonPoint {
+  type: 'Point';
+  coordinates: [number, number];
+  timestamp?: string;
+}
+
+export interface DeliveryLocation {
+  address: string;
+  coordinates: GeoJsonPoint; 
+}
 
 export interface Delivery {
-  _id: string
-  status: string
-  itemDescription: string
-  codigoEntrega?: string
-  checkInLiberadoManualmente?: boolean
-  origin: { address: string }
-  destination: { address: string }
+  _id: string;
+  status: DeliveryStatus; 
+  itemDescription: string;
+  codigoEntrega?: string;
+  checkInLiberadoManualmente?: boolean;
+  origin: DeliveryLocation; 
+  destination: DeliveryLocation; 
+  driverCurrentLocation?: GeoJsonPoint; 
+  routeHistory?: GeoJsonPoint[];
+  driverId?: { _id: string, nome: string } | string; 
 }
 
 export interface CreateDeliveryPayload {
   origin?: {
     address: string;
-    coordinates: { lat: number; lng: number; };
+    coordinates: { lat: number; lng: number };
   };
-  destination: { address: string; };
+  destination: { address: string };
   itemDescription: string;
   origemId?: string;
 }
@@ -31,7 +46,7 @@ export interface ApiResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EntregasService {
   private http = inject(HttpClient);
@@ -46,21 +61,27 @@ export class EntregasService {
   listarEntregas(): Observable<Delivery[]> {
     const headers = new HttpHeaders({
       'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
+      Pragma: 'no-cache',
+      Expires: '0',
     });
 
     return this.http.get<ApiResponse>(this.apiUrl, { headers }).pipe(
       map(response => response.deliveries || [])
     );
   }
-  liberarCheckInManual(deliveryId: string): Observable<any>{
-    const url = `${this.apiUrl}/${deliveryId}/liberar-checkin`
-    return this.http.patch(url, {})
+
+  liberarCheckInManual(deliveryId: string): Observable<Delivery> {
+    const url = `${this.apiUrl}/${deliveryId}/liberar-checkin`;
+    return this.http.patch<Delivery>(url, {});
   }
-  cancelarEntrega(deliveryId: string): Observable<any> {
+
+  cancelarEntrega(deliveryId: string): Observable<Delivery> {
     const url = `${this.apiUrl}/${deliveryId}/cancelar`;
-    return this.http.patch(url, {})
+    return this.http.patch<Delivery>(url, {});
+  }
+
+  getDirections(deliveryId: string): Observable<{ polyline: string }> {
+    const url = `${this.apiUrl}/${deliveryId}/directions`;
+    return this.http.get<{ polyline: string }>(url);
   }
 }
-

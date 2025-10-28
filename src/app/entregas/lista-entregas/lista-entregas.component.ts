@@ -53,7 +53,7 @@ export class ListaEntregasComponent implements OnInit, OnDestroy {
     'destination',
     'actions',
   ];
-  dataSource = new MatTableDataSource<any>();
+  dataSource = new MatTableDataSource<Delivery>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -75,7 +75,6 @@ export class ListaEntregasComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.deliveryUpdateSubscription?.unsubscribe();
-    this.socketService.disconnect();
   }
 
   abrirModalDetalhes(entrega: Delivery): void {
@@ -102,7 +101,6 @@ export class ListaEntregasComponent implements OnInit, OnDestroy {
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
         this.isLoading = false;
-        this.socketService.connect();
       },
       error: (err) => {
         console.error('Erro ao carregar entregas', err);
@@ -116,21 +114,18 @@ export class ListaEntregasComponent implements OnInit, OnDestroy {
     this.deliveryUpdateSubscription =
       this.socketService.deliveryUpdated$.subscribe((updatedDelivery) => {
         if (!updatedDelivery) return;
-
         const currentData = this.dataSource.data;
         const index = currentData.findIndex(
           (d) => d._id === updatedDelivery.deliveryId
         );
-
+        const payload = updatedDelivery.payload as Delivery;
         if (index > -1) {
-          currentData[index] = {
-            ...currentData[index],
-            ...updatedDelivery.payload,
-          };
+          currentData[index] = { ...currentData[index], ...payload };
         } else {
-          currentData.unshift(updatedDelivery.payload);
+          currentData.unshift(payload);
         }
-        this.dataSource.data = [...currentData];
+        const novaLista = [...currentData];
+        this.dataSource.data = novaLista;
       });
   }
 }

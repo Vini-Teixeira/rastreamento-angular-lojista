@@ -51,6 +51,7 @@ export class ListaEntregasComponent implements OnInit, OnDestroy {
     'status',
     'itemDescription',
     'destination',
+    'driverName',
     'actions',
   ];
   dataSource = new MatTableDataSource<Delivery>();

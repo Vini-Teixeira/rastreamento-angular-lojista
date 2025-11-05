@@ -29,6 +29,12 @@ export class GeocodingService {
     });
   }
 
+  searchAddress(query: string) {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`;
+  return this.http.get<any[]>(url);
+}
+
+
   getDirections(
     origin: LatLng,
     destination: LatLng

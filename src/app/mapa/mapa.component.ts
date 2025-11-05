@@ -65,8 +65,8 @@ export class MapaComponent implements AfterViewInit {
   public mapOptions: google.maps.MapOptions = {
     center: { lat: -10.9275, lng: -37.0734 },
     zoom: 12,
-    mapTypeControl: false,
-    streetViewControl: false,
+    mapTypeControl: true,
+    streetViewControl: true,
   };
 
   public clearHistoryPolylines() {
@@ -79,8 +79,8 @@ export class MapaComponent implements AfterViewInit {
     this.historyPolylineOptions = {
       path: path,
       strokeColor: color,
-      strokeOpacity: 0.7,
-      strokeWeight: 9,
+      strokeOpacity: 0.9,
+      strokeWeight: 8,
       zIndex: 2
     };
     this.historyPolylinePath = path;

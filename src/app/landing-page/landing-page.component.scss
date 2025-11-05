@@ -18,7 +18,8 @@ $font-stack: "Poppins", "Segoe UI", Roboto, sans-serif;
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   font-family: $font-stack;
   background: $bg-gradient;
   color: $text-dark;
@@ -29,6 +30,7 @@ a {
   text-decoration: none;
   color: $primary;
   transition: color 0.3s ease;
+
   &:hover {
     color: $primary-dark;
   }
@@ -76,6 +78,7 @@ header {
       font-size: 0.95rem;
       position: relative;
       padding-bottom: 4px;
+
       &::after {
         content: "";
         position: absolute;
@@ -86,6 +89,7 @@ header {
         background-color: $primary;
         transition: width 0.3s ease;
       }
+
       &:hover::after {
         width: 100%;
       }
@@ -99,20 +103,26 @@ header {
       font-weight: 600;
       font-size: 0.9rem;
       transition: all 0.3s ease;
-      
+
       visibility: visible !important;
       opacity: 1 !important;
 
       &.btn-login {
         background: $secondary;
         color: white;
-        &:hover { background: $secondary-dark; }
+
+        &:hover {
+          background: $secondary-dark;
+        }
       }
 
       &.btn-registrar {
         background: $primary;
         color: white;
-        &:hover { background: $primary-dark; }
+
+        &:hover {
+          background: $primary-dark;
+        }
       }
     }
   }
@@ -130,45 +140,50 @@ section {
   position: relative;
 }
 
-.first-section, .third-section {
+.first-section,
+.third-section {
   h1 {
     font-size: 3rem;
     font-weight: 700;
     color: $primary-dark;
-    margin-bottom: 1.5rem;
+    margin-bottom: 8.5rem;
   }
+
   span {
     font-size: 1.3rem;
     line-height: 1.8rem;
     color: $text-secondary;
+
     strong {
       color: $text-dark;
     }
   }
 }
 
-.second-section {
-  background: $bg-gradient;
+.how-it-works-section {
+  background: #FFFFFF;
+}
 
-  .content-box {
-    width: 100%;
-    max-width: 900px;
-    padding: 4rem;
-    background-color: #FFFFFF;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-    
-    h1 {
-      font-size: 2.8rem;
-      color: $primary-dark;
-      margin-bottom: 1.5rem;
-    }
-    .second-span {
-      font-size: 1.2rem;
-      color: $text-secondary;
-      strong {
-        color: $text-dark;
-      }
+.content-box {
+  width: 100%;
+  max-width: 1100px;
+  padding: 4rem;
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+
+  h1 {
+    font-size: 2.8rem;
+    color: $primary-dark;
+    margin-bottom: 1.5rem;
+  }
+
+  .second-span {
+    font-size: 1.2rem;
+    color: $text-secondary;
+
+    strong {
+      color: $text-dark;
     }
   }
 }
@@ -176,7 +191,7 @@ section {
 .section-title {
   font-size: 2.8rem;
   color: $primary-dark;
-  margin-bottom: 3rem;
+  margin-bottom: 8.5rem;
 }
 
 .benefits-grid {
@@ -184,18 +199,20 @@ section {
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   max-width: 1100px;
-  
+
   .benefit-item {
     mat-icon {
       font-size: 48px;
       color: $primary;
       margin-bottom: 1rem;
     }
+
     h3 {
       font-size: 1.5rem;
       color: $text-dark;
       margin-bottom: 0.5rem;
     }
+
     p {
       color: $text-secondary;
       line-height: 1.6;
@@ -203,10 +220,38 @@ section {
   }
 }
 
+.step-item {
+  span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $primary;
+    margin-bottom: 1rem;
+    border: 2px solid $primary;
+    border-radius: 50%;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    color: $text-dark;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: $text-secondary; // <-- Agora este estilo será aplicado
+    line-height: 1.6;
+  }
+}
+
 .steps-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  justify-content: center;
+  max-width: 1100px;
 }
 
 /* ---------- FOOTER ---------- */
@@ -242,6 +287,7 @@ footer {
     flex-direction: column;
     padding: 1rem 2rem;
     gap: 1rem;
+
     .a-btn-header {
       flex-wrap: wrap;
       justify-content: center;
@@ -250,9 +296,11 @@ footer {
 
   section {
     padding: 5rem 1.5rem;
+
     .anim-title {
       font-size: 2.3rem;
     }
+
     span {
       font-size: 1.1rem;
     }

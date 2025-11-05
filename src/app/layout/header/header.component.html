@@ -1,6 +1,9 @@
 <header>
   <div class="header-left">
-    <span class="app-title">Painel do Lojista</span>
+    <span class="app-title">
+      Painel do Lojista 
+      <ng-container *ngIf="lojaNome"> - {{ lojaNome }}</ng-container>
+    </span>
   </div>
   <div class="header-right">
     <button 

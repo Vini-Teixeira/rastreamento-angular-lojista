@@ -1,62 +1,55 @@
-// :host é a melhor prática para estilizar o elemento raiz do componente
 :host {
   display: flex;
   justify-content: center;
-  align-items: flex-start; // Alinha o formulário ao topo
+  align-items: flex-start;
   padding: 40px 24px;
   height: 100%;
   box-sizing: border-box;
-  overflow-y: auto; // Garante que o formulário possa rolar em telas pequenas
+  overflow-y: auto; 
 }
 
-// O contentor principal do nosso formulário
 .form-container {
   width: 100%;
-  max-width: 700px; // Limita a largura para uma boa legibilidade em telas grandes
+  max-width: 700px; 
   padding: 32px;
-  background-color: #ffffff; // Fundo branco limpo para o formulário
+  background-color: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); // Uma sombra subtil para dar profundidade
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
 }
 
-// Estilização da Tipografia (Hierarquia Visual)
 h2 {
   font-size: 28px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: #212529; // Um preto suave, não 100% preto
+  color: #212529;
 }
 
 p {
   font-size: 16px;
-  color: #6c757d; // Cinzento para o texto de suporte
+  color: #6c757d;
   margin-bottom: 32px;
 }
 
-// Organização dos campos do formulário
 form {
   display: flex;
   flex-direction: column;
-  gap: 20px; // Espaçamento consistente entre todos os campos
+  gap: 20px;
 }
 
-// Estilo para o grupo de Radio Buttons
 .delivery-type-group {
   display: flex;
   gap: 24px;
   margin-bottom: 12px;
 }
 
-// Estilo para a secção de ações (o botão principal)
 .actions {
   margin-top: 16px;
   
   button {
-    width: 100%; // Faz o botão ocupar a largura total
+    width: 100%;
   }
 }
 
-// Estilização das Mensagens de Feedback
 .success-message,
 .error-message {
   padding: 12px 16px;
@@ -67,23 +60,50 @@ form {
 }
 
 .success-message {
-  background-color: #d1e7dd; // Verde claro
-  color: #0f5132; // Verde escuro
+  background-color: #d1e7dd;
+  color: #0f5132;
 }
 
 .error-message {
-  background-color: #f8d7da; // Vermelho claro
-  color: #842029; // Vermelho escuro
+  background-color: #f8d7da;
+  color: #842029;
 }
 
-// Ajustes finos para os componentes do Angular Material
-// Usamos ::ng-deep para garantir que os nossos estilos sejam aplicados
+.sucata-checkbox {
+  margin-bottom: 20px;
+  display: block;
+}
+
+.address-field {
+  width: 100%;
+}
+
+mat-option {
+  font-size: 0.95em;
+  white-space: normal;
+  line-height: 1.3em;
+}
+
+
 ::ng-deep {
   .mat-radio-button.mat-accent .mat-radio-inner-circle {
-    background-color: #007bff; // Garante que a cor do radio button seja a primária
+    background-color: #007bff;
   }
 
   .mat-progress-spinner circle, .mat-spinner circle {
-    stroke: white; // Deixa o spinner do botão branco
+    stroke: white;
+  }
+}
+
+.documento-fiscal-container {
+  display: flex;
+  flex-direction: row;
+  gap: 16px; 
+
+  .tipo-documento {
+    flex: 1; 
+  }
+  .numero-documento {
+    flex: 2; 
   }
 }

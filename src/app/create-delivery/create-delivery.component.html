@@ -2,13 +2,16 @@
   <h2>Solicitar Nova Entrega</h2>
 
   <form [formGroup]="deliveryForm" (ngSubmit)="onSubmit()">
-    
     <mat-radio-group formControlName="deliveryType" class="delivery-type-group">
       <mat-radio-button value="propria">Entrega Própria</mat-radio-button>
       <mat-radio-button value="parceira">Retirar em Outra Loja</mat-radio-button>
     </mat-radio-group>
 
-    <mat-form-field appearance="outline" *ngIf="deliveryForm.get('deliveryType')?.value === 'parceira'">
+    <!-- Loja de origem -->
+    <mat-form-field
+      appearance="outline"
+      *ngIf="deliveryForm.get('deliveryType')?.value === 'parceira'"
+    >
       <mat-label>Loja de Origem</mat-label>
       <mat-select formControlName="origemId" required>
         <mat-option *ngFor="let loja of lojas$ | async" [value]="loja._id">
@@ -20,24 +23,112 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <!-- 1. CAMPO DE ENDEREÇO ATUALIZADO -->
+    <mat-form-field appearance="outline" class="address-field">
       <mat-label>Endereço de Destino</mat-label>
-      <input matInput formControlName="destinationAddress" placeholder="Rua, Número, Bairro...">
+      <input
+        matInput
+        type="text"
+        formControlName="destinationAddress"
+        placeholder="Digite o endereço..."
+        [matAutocomplete]="auto"
+      />
+      <!-- 2. PAINEL DE AUTOCOMPLETE CONECTADO -->
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option
+          *ngFor="let suggestion of suggestions"
+          [value]="suggestion.description"
+          (onSelectionChange)="selectSuggestion(suggestion)"
+        >
+          <!-- 
+            Podemos exibir os dados de forma mais estruturada se quisermos.
+            suggestion.structured_formatting.main_text
+            suggestion.structured_formatting.secondary_text
+          -->
+          {{ suggestion.description }}
+        </mat-option>
+      </mat-autocomplete>
+      
+      <mat-error *ngIf="deliveryForm.get('destinationAddress')?.hasError('required')">
+        Por favor, informe o endereço de destino.
+      </mat-error>
+      <mat-error *ngIf="deliveryForm.get('destinationCoords')?.hasError('required') && deliveryForm.get('destinationAddress')?.valid">
+        Endereço inválido. Por favor, selecione uma opção da lista.
+      </mat-error>
     </mat-form-field>
 
+    <!-- Descrição -->
     <mat-form-field appearance="outline">
+       <!-- ... (sem mudanças) ... -->
       <mat-label>Descrição do Item</mat-label>
-      <input matInput formControlName="itemDescription" placeholder="Ex: Bateria Moura M60AD">
+      <input
+        matInput
+        formControlName="itemDescription"
+        placeholder="Ex: Bateria Heliar HN60HD"
+      />
+      <mat-error *ngIf="deliveryForm.get('itemDescription')?.hasError('required')">
+        A descrição é obrigatória.
+      </mat-error>
     </mat-form-field>
 
+    <!-- Documento fiscal -->
+    <div
+      *ngIf="deliveryForm.get('deliveryType')?.value === 'propria'"
+      class="documento-fiscal-container"
+    >
+       <!-- ... (sem mudanças) ... -->
+      <mat-form-field appearance="outline" class="tipo-documento">
+        <mat-label>Tipo de Documento</mat-label>
+        <mat-select formControlName="tipoDocumento">
+          <mat-option value="NF">Nota Fiscal (NF)</mat-option>
+          <mat-option value="CUPOM_FISCAL">Cupom Fiscal</mat-option>
+        </mat-select>
+        <mat-error
+          *ngIf="deliveryForm.get('tipoDocumento')?.hasError('required')"
+        >
+          Obrigatório
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="numero-documento">
+        <mat-label>Número do Documento</mat-label>
+        <input
+          matInput
+          formControlName="numeroDocumento"
+          placeholder="Nº da NF ou Cupom"
+        />
+        <mat-error
+          *ngIf="deliveryForm.get('numeroDocumento')?.hasError('required')"
+        >
+          Obrigatório
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Checkbox sucata -->
+    <mat-checkbox formControlName="recolherSucata" class="sucata-checkbox">
+      Será recolhida sucata (bateria antiga)?
+    </mat-checkbox>
+
+    <!-- Ações -->
     <div class="actions">
-      <button mat-raised-button color="primary" type="submit" [disabled]="deliveryForm.invalid || isLoading">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="deliveryForm.invalid || isLoading"
+      >
         <span *ngIf="!isLoading">Solicitar Entrega</span>
         <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
       </button>
     </div>
 
-    <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
-    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+    <!-- Mensagens -->
+    <div *ngIf="successMessage" class="success-message">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
   </form>
 </div>

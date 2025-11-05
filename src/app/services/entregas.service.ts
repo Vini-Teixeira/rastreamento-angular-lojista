@@ -33,9 +33,15 @@ export interface CreateDeliveryPayload {
     address: string;
     coordinates: { lat: number; lng: number };
   };
-  destination: { address: string };
+  destination: { address: string;
+    coordinates: {lat: number, lng: number}
+   };
   itemDescription: string;
   origemId?: string;
+  recolherSucata?: boolean;
+  tipoEntrega: 'propria' | 'parceira'
+  tipoDocumento?: 'NF' | 'CUPOM FISCAL'
+  numeroDocumento?: string
 }
 
 export interface ApiResponse {

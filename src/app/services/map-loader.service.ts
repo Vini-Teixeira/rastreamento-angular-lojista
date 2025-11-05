@@ -20,7 +20,7 @@ export class MapLoaderService {
       return Promise.resolve();
     }
     
-    if (this.apiLoaded.getValue() || document.getElementById('google-maps-script')) {
+    if (this.apiLoaded.getValue() || (window as any).google?.maps) {
       if (!this.apiLoaded.getValue()) {
          this.apiLoaded.next(true);
       }
@@ -28,15 +28,21 @@ export class MapLoaderService {
     }
 
     return new Promise((resolve, reject) => {
+      if (document.getElementById('google-maps-script')) {
+        this.apiLoaded.next(true);
+        return resolve();
+      }
+
       const script = document.createElement('script');
       script.id = 'google-maps-script';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${this.apiKey}`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${this.apiKey}&libraries=places`;
+      
       script.async = true;
       script.defer = true;
       
       script.onload = () => {
         this.apiLoaded.next(true);
-        console.log('Google Maps API carregada com sucesso (via APP_INITIALIZER)!');
+        console.log('Google Maps API (com Places) carregada com sucesso (via APP_INITIALIZER)!');
         resolve();
       };
       

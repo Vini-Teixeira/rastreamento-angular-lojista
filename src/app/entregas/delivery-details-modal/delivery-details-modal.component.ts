@@ -62,9 +62,11 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
 
   private localRouteHistory: LatLng[] = [];
 
+  /* Polylines guardadas para uso futuro.
   private polylineRotaEntregadorLoja: string | null = null;
   private polylineRotaLojaCliente: string | null = null;
   private polylineRotaEntregadorCliente: string | null = null;
+  */
 
   ngOnInit(): void {
     this.coordsLoja = this.getCoords(
@@ -155,9 +157,6 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
           this.coordsLoja,
           this.coordsCliente,
           'orange',
-          (polyline) => {
-            this.polylineRotaLojaCliente = polyline;
-          }
         );
         break;
       case DeliveryStatus.ACEITO:
@@ -167,18 +166,11 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
             this.coordsEntregador,
             this.coordsLoja,
             'blue',
-            (polyline) => {
-              this.polylineRotaEntregadorLoja = polyline;
-            }
           );
           this.fetchAndDrawPolyline(
             this.coordsLoja,
             this.coordsCliente,
             'lightskyblue',
-            (polyline) => {
-              this.polylineRotaLojaCliente = polyline;
-            },
-            true
           );
         }
         break;
@@ -190,9 +182,6 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
             this.coordsEntregador,
             this.coordsCliente,
             'green',
-            (polyline) => {
-              this.polylineRotaEntregadorCliente = polyline;
-            }
           );
         }
         break;
@@ -214,20 +203,21 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
   }
 
   private fetchAndDrawPolyline(
-    origin: LatLng,
-    destination: LatLng,
-    color: 'orange' | 'blue' | 'green' | 'lightskyblue',
-    callback: (polyline: string) => void,
-    dotted: boolean = false
-  ): void {
-    this.geocodingService.getDirections(origin, destination).subscribe({
-      next: (response) => {
-        this.mapaComponent.drawPolyline(response.polyline, color, dotted);
-        callback(response.polyline);
-      },
-      error: (err) => console.error(`Erro ao buscar polyline ${color}:`, err),
-    });
-  }
+  origin: LatLng,
+  destination: LatLng,
+  color: 'orange' | 'blue' | 'green' | 'lightskyblue',
+  callback?: (polyline: string) => void,
+  dotted: boolean = false
+): void {
+  this.geocodingService.getDirections(origin, destination).subscribe({
+    next: (response) => {
+      this.mapaComponent.drawPolyline(response.polyline, color, dotted);
+      callback?.(response.polyline);
+    },
+    error: (err) => console.error(`Erro ao buscar polyline ${color}:`, err),
+  });
+}
+
 
   private getCoords(coords: CoordsTuple): LatLng {
     return { lat: coords[1], lng: coords[0] };

@@ -10,21 +10,103 @@
   </div>
 
   <form [formGroup]="socorroForm" (ngSubmit)="onSubmit()">
+    <!-- 1. CAMPO DE ENDEREÇO ATUALIZADO COM AUTOCOMPLETE -->
     <mat-form-field appearance="outline">
       <mat-label>Endereço do Cliente</mat-label>
-      <input matInput formControlName="address" placeholder="Ex: Rua das Flores, 123, Bairro, Cidade" required>
+      <input
+        matInput
+        formControlName="address"
+        placeholder="Digite o endereço..."
+        [matAutocomplete]="auto"
+        required
+      />
+      <mat-autocomplete #auto="matAutocomplete">
+        <mat-option
+          *ngFor="let suggestion of suggestions"
+          [value]="suggestion.description"
+          (onSelectionChange)="selectSuggestion(suggestion)"
+        >
+          {{ suggestion.description }}
+        </mat-option>
+      </mat-autocomplete>
       <mat-error *ngIf="socorroForm.get('address')?.hasError('required')">
         O endereço é obrigatório.
       </mat-error>
+      <mat-error *ngIf="socorroForm.hasError('addressInvalid')">
+        Forneça um endereço válido (digite completo ou selecione uma sugestão).
+      </mat-error>
     </mat-form-field>
 
+    <!-- 2. NOVOS CAMPOS DO CLIENTE -->
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome do Cliente</mat-label>
+        <input
+          matInput
+          formControlName="clienteNome"
+          placeholder="Nome"
+          required
+        />
+        <mat-error *ngIf="socorroForm.get('clienteNome')?.hasError('required')">
+          O nome é obrigatório.
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Telefone do Cliente</mat-label>
+        <input
+          matInput
+          formControlName="clienteTelefone"
+          placeholder="Ex: 79912345678"
+          type="tel"
+          required
+        />
+        <mat-error
+          *ngIf="socorroForm.get('clienteTelefone')?.hasError('required')"
+        >
+          O telefone é obrigatório.
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- 3. NOVOS CAMPOS DO VEÍCULO (Opcionais, como você sugeriu) -->
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Placa do Veículo (Opcional)</mat-label>
+        <input
+          matInput
+          formControlName="placaVeiculo"
+          placeholder="Ex: AAA1234"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Modelo do Veículo (Opcional)</mat-label>
+        <input
+          matInput
+          formControlName="modeloVeiculo"
+          placeholder="Ex: Fiat Uno"
+        />
+      </mat-form-field>
+    </div>
+
+    <!-- 4. CAMPO DE DESCRIÇÃO (Como antes) -->
     <mat-form-field appearance="outline">
       <mat-label>Descrição do Serviço (Opcional)</mat-label>
-      <textarea matInput formControlName="serviceDescription" placeholder="Ex: Cliente relatou que a bateria não está a segurar a carga."></textarea>
+      <textarea
+        matInput
+        formControlName="serviceDescription"
+        placeholder="Ex: Cliente relatou que a bateria não está a segurar a carga."
+      ></textarea>
     </mat-form-field>
 
     <div class="actions">
-      <button mat-raised-button color="primary" type="submit" [disabled]="socorroForm.invalid || isLoading">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="socorroForm.invalid || isLoading"
+      >
         <span *ngIf="!isLoading">Solicitar Socorro</span>
         <mat-spinner *ngIf="isLoading" diameter="24"></mat-spinner>
       </button>

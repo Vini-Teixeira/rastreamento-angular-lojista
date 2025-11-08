@@ -238,7 +238,7 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
     if (formValue.deliveryType === 'parceira' && formValue.origemId) {
       payload.origemId = formValue.origemId;
     }
-
+    console.log(payload);
     this.entregasService.createDelivery(payload).subscribe({
       next: () => {
         this.isLoading = false;

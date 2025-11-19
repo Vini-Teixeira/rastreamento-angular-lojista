@@ -1,9 +1,29 @@
 @use 'variables' as vars;
 
 :host {
-  display: block;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+.painel-container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  padding: 16px;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+
+.conteudo {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  grid-template-rows: 1fr;
+  gap: 16px;
+  overflow: hidden;
 }
 
 .painel-geral-grid {

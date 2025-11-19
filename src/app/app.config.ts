@@ -4,6 +4,7 @@ import {
   APP_INITIALIZER,
   PLATFORM_ID,
   inject,
+  importProvidersFrom,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
@@ -15,6 +16,8 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { authInterceptor } from './services/auth/auth.interceptor';
 import { MapLoaderService } from './services/map-loader.service';
+import { ToastrModule } from 'ngx-toastr';
+import { MatDialogModule } from '@angular/material/dialog';
 
 export function initializeGoogleMaps(): () => Promise<void> {
   const mapLoader = inject(MapLoaderService);
@@ -27,7 +30,17 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimations(),
-    provideClientHydration(withEventReplay()),
+    importProvidersFrom(
+      ToastrModule.forRoot({
+        positionClass: 'toast-bottom-right',
+        preventDuplicates: true,
+        closeButton: true,
+        timeOut: 6000,
+        extendedTimeOut: 2000
+      })
+    ),
+    importProvidersFrom(MatDialogModule),
+    //provideClientHydration(withEventReplay()),
     provideHttpClient(withInterceptors([authInterceptor])),
 
     {

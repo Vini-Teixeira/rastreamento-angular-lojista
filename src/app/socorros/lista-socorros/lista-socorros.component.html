@@ -1,7 +1,7 @@
 <div class="table-wrapper">
   <div *ngIf="isLoading" class="loading-shade">
     <mat-spinner diameter="50"></mat-spinner>
-    <p>Carregando entregas...</p>
+    <p>Carregando socorros...</p>
   </div>
 
   <div *ngIf="error && !isLoading" class="error-message">
@@ -13,7 +13,6 @@
 
   <div class="table-container" [hidden]="isLoading || error">
     <table mat-table [dataSource]="dataSource" matSort>
-      <!-- Coluna Status -->
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
         <td mat-cell *matCellDef="let element">
@@ -23,57 +22,40 @@
         </td>
       </ng-container>
 
-      <!-- Coluna Item -->
-      <ng-container matColumnDef="itemDescription">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Item</th>
+      <ng-container matColumnDef="clienteNome">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Cliente</th>
         <td mat-cell *matCellDef="let element">
-          <div class="item-description">{{ element.itemDescription }}</div>
-
-          <div *ngIf="element.codigoEntrega" class="delivery-code">
-            Cód: {{ element.codigoEntrega }}
-          </div>
+          <div class="item-description">{{ element.clienteNome }}</div>
+          <div class="delivery-code">Código: {{ element.codigoSocorro }}</div>
         </td>
       </ng-container>
 
-      <!-- Coluna Destino -->
-      <ng-container matColumnDef="destination">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Destino</th>
+      <ng-container matColumnDef="clientLocation">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          Local do Cliente
+        </th>
         <td mat-cell *matCellDef="let element">
-          {{ element.destination?.address }}
+          {{ element.clientLocation?.address }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="driverName">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Entregador</th>
         <td mat-cell *matCellDef="let element">
-          {{ element.driverId && typeof element.driverId === 'object' ? element.driverId.nome : '-' }}
+          {{ element.driverId?.nome || "-" }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Ações</th>
         <td mat-cell *matCellDef="let element">
-
           <button
-            *ngIf="element.status?.toUpperCase() === 'UNASSIGNED'"
-            mat-flat-button 
-            color="warn" 
-            (click)="abrirModalAtribuicao(element)"
-            matTooltip="Ação necessária: Atribuir entregador"
-          >
-            <mat-icon>person_add</mat-icon>
-            Atribuir
-          </button>
-
-          <button
-            *ngIf="element.status?.toUpperCase() !== 'UNASSIGNED'"
             mat-icon-button
             (click)="abrirModalDetalhes(element)"
-            matTooltip="Ver detalhes da entrega"
+            matTooltip="Ver detalhes do socorro"
           >
             <mat-icon>visibility</mat-icon>
           </button>
-
         </td>
       </ng-container>
 
@@ -86,9 +68,9 @@
     </table>
 
     <mat-paginator
-      [pageSizeOptions]="[5, 10, 20]"
+      [pageSizeOptions]="[10, 25, 50]"
       showFirstLastButtons
-      aria-label="Selecione a página de entregas"
+      aria-label="Selecione a página de socorros"
     >
     </mat-paginator>
   </div>

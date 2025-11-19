@@ -2,7 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { DeliveryStatus } from '../core/enums/delivery-status.enum'; 
+import { DeliveryStatus } from '../core/enums/delivery-status.enum';
+import { AuthService } from './auth/auth.service';
 
 export interface GeoJsonPoint {
   type: 'Point';
@@ -37,6 +38,10 @@ export interface CreateDeliveryPayload {
     coordinates: {lat: number, lng: number}
    };
   itemDescription: string;
+  clienteNome: string;
+  clienteTelefone: string;
+  modalidadePagamento: string;
+  observacoes?: string;
   origemId?: string;
   recolherSucata?: boolean;
   tipoEntrega: 'propria' | 'parceira'
@@ -57,6 +62,7 @@ export interface ApiResponse {
 export class EntregasService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/entregas`;
+  private authService = inject(AuthService)
 
   constructor() {}
 
@@ -84,6 +90,17 @@ export class EntregasService {
   cancelarEntrega(deliveryId: string): Observable<Delivery> {
     const url = `${this.apiUrl}/${deliveryId}/cancelar`;
     return this.http.patch<Delivery>(url, {});
+  }
+
+  assignManual(deliveryId: string, driverId: string): Observable<Delivery> {
+    const token = this.authService.getToken()
+    const body = { driverId: driverId }
+
+    return this.http.post<Delivery>(
+      `${this.apiUrl}/${deliveryId}/assign-manual`,
+      body, 
+      {headers: { Authorization: `Bearer ${token}` }}
+    )
   }
 
   getDirections(deliveryId: string): Observable<{ polyline: string }> {

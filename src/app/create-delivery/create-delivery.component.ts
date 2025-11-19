@@ -21,6 +21,8 @@ import {
   CreateDeliveryPayload,
 } from '../services/entregas.service';
 import { LojistasService, Lojista } from '../services/lojistas.service';
+import { EModoPagamento } from '../core/enums/pagamento.enum';
+import { ToastrService } from 'ngx-toastr';
 //import { GeocodingService } from '../services/geocoding/geocoding.service';
 
 declare const google: any;
@@ -57,7 +59,17 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
   private entregasService = inject(EntregasService);
   private lojistasService = inject(LojistasService);
   private ngZone = inject(NgZone);
+  private toastr = inject(ToastrService)
   //private geocodingService = inject(GeocodingService);
+
+  public pagamentoOptions = [
+    { value: EModoPagamento.PIX, viewValue: 'PIX' },
+    { value: EModoPagamento.DINHEIRO, viewValue: 'Dinheiro' },
+    {
+      value: EModoPagamento.CARTAO_MAQUININHA,
+      viewValue: 'Cartão (Maquininha)',
+    },
+  ];
 
   suggestions: google.maps.places.AutocompletePrediction[] = [];
   private autocompleteService: any;
@@ -65,18 +77,16 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
   private mapEl = document.createElement('div');
 
   ngOnInit(): void {
-    // --- ✨ CORREÇÃO ✨ ---
-    // Removemos o bloco try...catch e a inicialização dos
-    // serviços do Google daqui. O ngOnInit agora está limpo.
-    // O script <script async defer> no index.html ainda está carregando,
-    // e não vamos mais competir com ele.
-    
     this.deliveryForm = this.fb.group({
       deliveryType: ['propria', Validators.required],
       origemId: [null],
       destinationAddress: ['', Validators.required],
-      destinationCoords: [null, Validators.required], // <- Mantido
+      destinationCoords: [null, Validators.required],
       itemDescription: ['', [Validators.required, Validators.minLength(3)]],
+      clienteNome: ['', Validators.required],
+      clienteTelefone: ['', [Validators.required]],
+      modalidadePagamento: [null, Validators.required],
+      observacoes: [''],
       recolherSucata: [false],
       tipoDocumento: [null],
       numeroDocumento: [''],
@@ -95,7 +105,7 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
     const sub = this.deliveryForm
       .get('destinationAddress')
       ?.valueChanges.pipe(
-        debounceTime(400),
+        debounceTime(80),
         distinctUntilChanged(),
         tap((value) => this.getAutocompleteSuggestions(value))
       )
@@ -108,17 +118,13 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
       this.suggestions = [];
       return;
     }
-    
-    // --- LÓGICA JIT (Just-in-Time) ---
-    // Esta é a lógica correta. Ela só roda quando o usuário digita
-    // e garante que 'window.google' já existe.
     if (!this.autocompleteService && window.google) {
       this.autocompleteService = new google.maps.places.AutocompleteService();
     }
-    
+
     if (!this.autocompleteService) {
-      console.warn("AutocompleteService ainda não está pronto.");
-      return; // Proteção caso algo ainda não tenha carregado
+      console.warn('AutocompleteService ainda não está pronto.');
+      return;
     }
 
     this.autocompleteService.getPlacePredictions(
@@ -150,7 +156,7 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
   ): void {
     if (!suggestion.place_id) return;
 
-    this.suggestions = []; 
+    this.suggestions = [];
     if (!this.placesService && window.google) {
       this.placesService = new google.maps.places.PlacesService(this.mapEl);
     }
@@ -206,29 +212,32 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (this.deliveryForm.invalid || this.isLoading) {
       this.deliveryForm.markAllAsTouched();
-       if (this.deliveryForm.get('destinationCoords')?.invalid) {
-        this.errorMessage = "Por favor, selecione um endereço válido da lista de sugestões.";
+      if (this.deliveryForm.get('destinationCoords')?.invalid) {
+        this.errorMessage =
+          'Por favor, selecione um endereço válido da lista de sugestões.';
       }
       return;
     }
-
     if (!this.deliveryForm.get('destinationCoords')?.value) {
-      this.errorMessage = "Por favor, selecione um endereço válido da lista de sugestões.";
+      this.errorMessage =
+        'Por favor, selecione um endereço válido da lista de sugestões.';
       return;
     }
-
     this.isLoading = true;
     this.errorMessage = null;
     this.successMessage = null;
-
     const formValue = this.deliveryForm.value;
-
+    const cleanTelefone = (formValue.clienteTelefone || '').replace(/\D/g, '');
     const payload: CreateDeliveryPayload = {
       destination: {
         address: formValue.destinationAddress,
         coordinates: formValue.destinationCoords,
       },
       itemDescription: formValue.itemDescription,
+      clienteNome: formValue.clienteNome,
+      clienteTelefone: cleanTelefone,
+      modalidadePagamento: formValue.modalidadePagamento,
+      observacoes: formValue.observacoes,
       recolherSucata: formValue.recolherSucata,
       tipoEntrega: formValue.deliveryType,
       tipoDocumento: formValue.tipoDocumento,
@@ -240,15 +249,19 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
     }
     console.log(payload);
     this.entregasService.createDelivery(payload).subscribe({
-      next: () => {
+      next: (novaEntrega) => {
         this.isLoading = false;
-        this.successMessage = `Entrega criada com sucesso! A notificar o entregador...`;
-        this.deliveryForm.reset({ deliveryType: 'propria' });
-        this.deliveryForm.patchValue({ destinationCoords: null });
+        this.toastr.success(
+          `Entrega #${novaEntrega.codigoEntrega} criada e enviada ao motorista.`,
+          'Entrega Criada com Sucesso'
+        );
+        const currentDeliveryType = 
+        this.deliveryForm.get('deliveryType')?.value || 'propria';
+        this.deliveryForm.reset({ deliveryType: currentDeliveryType })
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Falha ao criar a entrega.';
+        this.toastr.error(err.error?.message || 'Falha ao criar a entrega.', 'Erro');
       },
     });
   }

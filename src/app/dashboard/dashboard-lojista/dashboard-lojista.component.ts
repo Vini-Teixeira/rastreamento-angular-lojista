@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core'; // VOLTAMOS COM ONINIT/ONDESTROY
+import { Component, OnInit, OnDestroy, inject } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
 import { NgxChartsModule, LegendPosition } from '@swimlane/ngx-charts';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { LojistasService, DashboardSummary } from '../../services/lojistas.service'; // VOLTAMOS COM ESSES
+import { LojistasService, DashboardSummary } from '../../services/lojistas.service'; 
 import { SocketService } from '../../services/socket.service';
-import { Subscription } from 'rxjs'; // VOLTAMOS COM SUBSCRIPTION
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-lojista',
@@ -22,7 +22,7 @@ export class DashboardLojistaComponent implements OnInit, OnDestroy {
   isLoading = true;
   error: string | null = null;
   colorScheme: any = {
-    domain: ['#28A745', '#FFC107', '#DC3545']
+    domain: ['#28A745', '#FFC107', '#DC3545', '#4361EE']
   };
 
   private updateSubscription!: Subscription;

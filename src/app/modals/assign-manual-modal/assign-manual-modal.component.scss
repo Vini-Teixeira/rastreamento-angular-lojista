@@ -1,0 +1,54 @@
+:host {
+  display: block;
+  min-width: 400px;
+}
+
+mat-dialog-content {
+  min-height: 200px;
+  max-height: 60vh;
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #777;
+
+  mat-spinner {
+    margin-bottom: 16px;
+  }
+}
+
+.error-container {
+  color: #d93025; 
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    margin-bottom: 16px;
+  }
+}
+
+.drivers-list {
+  .radio-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  mat-list-option {
+    ::ng-deep .mdc-list-item__start {
+      display: none; 
+    }
+    &[aria-selected="true"] {
+      background: rgba(26, 115, 232, 0.1);
+    }
+  }
+}
+
+mat-dialog-actions button mat-spinner {
+  margin: 0 24px; 
+  color: white;
+}

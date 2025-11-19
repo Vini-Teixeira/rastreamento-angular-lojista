@@ -12,7 +12,7 @@
       appearance="outline"
       *ngIf="deliveryForm.get('deliveryType')?.value === 'parceira'"
     >
-      <mat-label>Loja de Origem</mat-label>
+      <mat-label>Loja de Retirada</mat-label>
       <mat-select formControlName="origemId" required>
         <mat-option *ngFor="let loja of lojas$ | async" [value]="loja._id">
           {{ loja.nomeFantasia }}
@@ -22,8 +22,6 @@
         Por favor, selecione a loja de origem.
       </mat-error>
     </mat-form-field>
-
-    <!-- 1. CAMPO DE ENDEREÇO ATUALIZADO -->
     <mat-form-field appearance="outline" class="address-field">
       <mat-label>Endereço de Destino</mat-label>
       <input
@@ -33,18 +31,12 @@
         placeholder="Digite o endereço..."
         [matAutocomplete]="auto"
       />
-      <!-- 2. PAINEL DE AUTOCOMPLETE CONECTADO -->
       <mat-autocomplete #auto="matAutocomplete">
         <mat-option
           *ngFor="let suggestion of suggestions"
           [value]="suggestion.description"
           (onSelectionChange)="selectSuggestion(suggestion)"
         >
-          <!-- 
-            Podemos exibir os dados de forma mais estruturada se quisermos.
-            suggestion.structured_formatting.main_text
-            suggestion.structured_formatting.secondary_text
-          -->
           {{ suggestion.description }}
         </mat-option>
       </mat-autocomplete>
@@ -59,7 +51,6 @@
 
     <!-- Descrição -->
     <mat-form-field appearance="outline">
-       <!-- ... (sem mudanças) ... -->
       <mat-label>Descrição do Item</mat-label>
       <input
         matInput
@@ -71,12 +62,50 @@
       </mat-error>
     </mat-form-field>
 
+    <div class="form-row">
+  <mat-form-field appearance="outline" class="form-row-item">
+    <mat-label>Nome do Cliente</mat-label>
+    <input matInput formControlName="clienteNome" placeholder="Nome de quem vai receber">
+    <mat-error *ngIf="deliveryForm.get('clienteNome')?.hasError('required')">
+      Nome é obrigatório.
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="form-row-item">
+        <mat-label>Telefone do Cliente</mat-label>
+        <input 
+          matInput 
+          formControlName="clienteTelefone" 
+          placeholder="(00) 00000-0000" 
+          mask="(00) 00000-0000">
+        <mat-error *ngIf="deliveryForm.get('clienteTelefone')?.hasError('required')">
+          Telefone é obrigatório.
+        </mat-error>
+      </mat-form-field>
+</div>
+
+<mat-form-field appearance="outline">
+  <mat-label>Modalidade de Pagamento</mat-label>
+  <mat-select formControlName="modalidadePagamento" required>
+    <mat-option value="PIX">PIX</mat-option>
+    <mat-option value="DINHEIRO">Dinheiro</mat-option>
+    <mat-option value="CARTAO_MAQUININHA">Cartão (Maquininha)</mat-option>
+  </mat-select>
+  <mat-error *ngIf="deliveryForm.get('modalidadePagamento')?.hasError('required')">
+    Selecione o pagamento.
+  </mat-error>
+</mat-form-field>
+
+<mat-form-field appearance="outline">
+  <mat-label>Observações</mat-label>
+  <textarea matInput formControlName="observacoes" placeholder="Ex: Deixar na portaria, levar maquininha ou com troco para R$100..."></textarea>
+</mat-form-field>
+
     <!-- Documento fiscal -->
     <div
       *ngIf="deliveryForm.get('deliveryType')?.value === 'propria'"
       class="documento-fiscal-container"
     >
-       <!-- ... (sem mudanças) ... -->
       <mat-form-field appearance="outline" class="tipo-documento">
         <mat-label>Tipo de Documento</mat-label>
         <mat-select formControlName="tipoDocumento">

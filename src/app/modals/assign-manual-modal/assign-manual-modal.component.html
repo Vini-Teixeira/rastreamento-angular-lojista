@@ -1,0 +1,50 @@
+<h2 mat-dialog-title>Atribuir Entregador</h2>
+<mat-dialog-content>
+  <p>
+    Selecione um entregador disponível para a entrega
+    <strong>#{{ data.entrega.codigoEntrega }}</strong>.
+  </p>
+
+  <div *ngIf="isLoadingDrivers" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Buscando entregadores...</span>
+  </div>
+
+  <div *ngIf="error && !isLoadingDrivers" class="error-container">
+    <mat-icon>warning</mat-icon>
+    <span>{{ error }}</span>
+  </div>
+
+  <div
+    *ngIf="!isLoadingDrivers && !error && availableDrivers.length > 0"
+    class="drivers-list"
+  >
+    <mat-selection-list [multiple]="false" [(ngModel)]="selectedDriverId" class="radio-list">
+      <mat-list-option
+        *ngFor="let driver of availableDrivers"
+        [value]="driver._id"
+      >
+        <mat-icon matListItemIcon>person</mat-icon>
+        <div matListItemTitle>{{ driver.nome }}</div>
+        <div matListItemLine>
+          <span>{{ driver.veiculo?.placa || 'Sem veículo' }}</span>
+        </div>
+      </mat-list-option>
+    </mat-selection-list>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="isSubmitting">
+    Cancelar
+  </button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="onAssign()"
+    [disabled]="!selectedDriverId || selectedDriverId.length === 0 || isSubmitting"
+  >
+    <span *ngIf="!isSubmitting">Confirmar Atribuição</span>
+    <mat-spinner *ngIf="isSubmitting" diameter="20" color="white"></mat-spinner>
+  </button>
+</mat-dialog-actions>

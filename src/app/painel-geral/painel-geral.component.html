@@ -4,6 +4,22 @@
   </div>
 
   <div class="lista-container">
-    <app-lista-entregas></app-lista-entregas>
+    <mat-tab-group animationDuration="0ms" class="lista-tabs">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>local_shipping</mat-icon>
+          Entregas
+        </ng-template>
+        <app-lista-entregas></app-lista-entregas>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>sos</mat-icon>
+          Socorros
+        </ng-template>
+        <app-lista-socorros></app-lista-socorros>
+      </mat-tab>
+
+    </mat-tab-group>
   </div>
 </div>

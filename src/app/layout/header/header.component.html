@@ -8,18 +8,30 @@
   <div class="header-right">
     <button 
       mat-stroked-button 
+      color="primary" 
+      routerLink="/painel/nova-entrega">
+      <mat-icon>add</mat-icon>
+      Nova Entrega
+    </button>
+
+    <button 
+      mat-raised-button 
       color="accent" 
       routerLink="/painel/solicitar-socorro">
       <mat-icon>sos</mat-icon>
       Solicitar Socorro
     </button>
-    
+
     <button 
-      mat-raised-button 
-      color="primary" 
-      routerLink="/painel/nova-entrega">
-      <mat-icon>add</mat-icon>
-      Nova Entrega
+      mat-icon-button 
+      class="notification-bell"
+      (click)="onBellClick()"
+      [matBadge]="(unreadCount$ | async) || 0" 
+      [matBadgeHidden]="(unreadCount$ | async) === 0"
+      matBadgeColor="warn"
+      matBadgePosition="above after"
+      matBadgeSize="small">
+      <mat-icon>notifications</mat-icon>
     </button>
     
     <div class="profile-icon">
@@ -27,3 +39,9 @@
     </div>
   </div>
 </header>
+
+<app-notification-panel 
+  *ngIf="isPanelVisible"
+  (clickOutside)="closePanel()" 
+>
+</app-notification-panel>

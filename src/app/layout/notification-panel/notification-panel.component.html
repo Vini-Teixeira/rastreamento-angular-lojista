@@ -1,0 +1,38 @@
+<div class="notification-container">
+  <div class="panel-header">
+    <h3>Notificações</h3>
+    </div>
+  
+  <mat-divider></mat-divider>
+
+  <div class="panel-body">
+    <ng-container *ngIf="notifications$ | async as notifications; else noNotifications">
+      <div *ngIf="notifications.length > 0; else noNotifications">
+        
+        <div 
+          *ngFor="let notification of notifications; trackBy: trackByNotification" 
+          class="notification-item"
+          [class.read]="notification.read">
+
+          <div class="notification-badge" [ngClass]="getNotificationClass(notification)">
+            <mat-icon>{{ getNotificationIcon(notification) }}</mat-icon>
+          </div>
+
+          <div class="notification-content">
+            <span class="title">{{ notification.titulo }}</span>
+            <span class="message">{{ notification.mensagem }}</span>
+            <span class="time-ago">{{ timeAgoMap.get(notification) }}</span>
+          </div>
+        </div>
+        
+      </div>
+    </ng-container>
+
+    <ng-template #noNotifications>
+      <div class="no-notifications">
+        <mat-icon>notifications_off</mat-icon>
+        <span>Nenhuma notificação por enquanto.</span>
+      </div>
+    </ng-template>
+  </div>
+</div>

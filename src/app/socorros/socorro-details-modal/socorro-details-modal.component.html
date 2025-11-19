@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>Detalhes do Socorro</h1>
+<div mat-dialog-content>
+  <p>
+    Exibindo detalhes para o Socorro ID:
+    <strong>{{ socorro._id }}</strong>
+  </p>
+  <p>
+    Status: <strong>{{ socorro.status }}</strong>
+  </p>
+  <p>
+    Cliente: <strong>{{ socorro.clienteNome }}</strong>
+  </p>
+  <p>
+    Local: <strong>{{ socorro.clientLocation.address }}</strong>
+  </p>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()">Fechar</button>
+</div>

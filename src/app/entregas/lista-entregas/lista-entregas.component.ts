@@ -15,16 +15,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {
-  MatDialog,
-  MatDialogModule,
-} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { PainelEstadoService } from '../../services/painel-estado.service';
+import { ToastrService } from 'ngx-toastr';
 import { EntregasService, Delivery } from '../../services/entregas.service';
 import { SocketService } from '../../services/socket.service';
 import { DeliveryDetailsModalComponent } from '../delivery-details-modal/delivery-details-modal.component';
 import { FormatStatusPipe } from '../../shared/pipes/format-status.pipe';
+import { AssignManualModalComponent } from '../../modals/assign-manual-modal/assign-manual-modal.component';
 
 @Component({
   selector: 'app-lista-entregas',
@@ -38,8 +36,8 @@ import { FormatStatusPipe } from '../../shared/pipes/format-status.pipe';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatDialogModule,
-    FormatStatusPipe
+    FormatStatusPipe,
+    AssignManualModalComponent,
   ],
   templateUrl: './lista-entregas.component.html',
   styleUrls: ['./lista-entregas.component.scss'],
@@ -62,11 +60,11 @@ export class ListaEntregasComponent implements OnInit, OnDestroy {
   isLoading = true;
   error: string | null = null;
 
+  private toastr = inject(ToastrService);
   private deliveryUpdateSubscription!: Subscription;
-
-  private painelEstadoService = inject(PainelEstadoService);
   private entregasService = inject(EntregasService);
   private socketService = inject(SocketService);
+
   public dialog = inject(MatDialog);
 
   ngOnInit(): void {
@@ -114,19 +112,35 @@ export class ListaEntregasComponent implements OnInit, OnDestroy {
   ouvirAtualizacoes(): void {
     this.deliveryUpdateSubscription =
       this.socketService.deliveryUpdated$.subscribe((updatedDelivery) => {
-        if (!updatedDelivery) return;
-        const currentData = this.dataSource.data;
-        const index = currentData.findIndex(
-          (d) => d._id === updatedDelivery.deliveryId
+        if (!updatedDelivery || !updatedDelivery.payload) return;
+        console.log(
+          `[ListaEntregas] Evento 'deliveryUpdated$' recebido! Status: ${updatedDelivery.payload.status}`,
+          updatedDelivery.payload
         );
+
+        const currentData = this.dataSource.data;
         const payload = updatedDelivery.payload as Delivery;
+
+        const index = currentData.findIndex((d) => d._id === payload._id);
+
         if (index > -1) {
-          currentData[index] = { ...currentData[index], ...payload };
+          currentData[index] = payload;
         } else {
           currentData.unshift(payload);
         }
-        const novaLista = [...currentData];
-        this.dataSource.data = novaLista;
+        this.dataSource.data = [...currentData];
       });
+  }
+
+  abrirModalAtribuicao(entrega: Delivery): void {
+    const dialogRef = this.dialog.open(AssignManualModalComponent, {
+      width: '450px',
+      data: { entrega: entrega },
+    });
+    dialogRef.afterClosed().subscribe((success) => {
+      if (success === true) {
+        this.toastr.success('Entrega atribuída e motorista notificado!');
+      }
+    });
   }
 }

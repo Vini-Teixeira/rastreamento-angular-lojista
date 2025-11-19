@@ -31,7 +31,7 @@
 
 .table-container {
   flex-grow: 1;
-  overflow-y: hidden;
+  overflow-y: auto;
 }
 
 table {
@@ -66,6 +66,7 @@ table {
   color: vars.$text-secondary;
   margin-top: 4px;
   font-family: monospace;
+  letter-spacing: 0.5px;
 }
 
 button.mat-icon-button {
@@ -97,18 +98,23 @@ mat-paginator {
 }
 
 .status-badge.status-pendente,
-.status-badge.status-aceito,
-.status-badge.status-a_caminho,
-.status-badge.status-em_atendimento {
-  background-color: vars.$warning;
+.status-badge.status-aceito {
+  background-color: vars.$warning; 
   color: vars.$text-dark;
 }
 
-.status-badge.status-finalizado {
-  background-color: vars.$success;
+.status-badge.status-a_caminho {
+  background-color: #3498db;
 }
 
-.status-badge.status-cancelado,
-.status-badge.status-unassigned {
-  background-color: #e74c3c;
+.status-badge.status-no_local {
+  background-color: #9b59b6;
+}
+
+.status-badge.status-concluído {
+  background-color: vars.$success; 
+}
+
+.status-badge.status-cancelado {
+  background-color: #e74c3c; 
 }

@@ -95,6 +95,14 @@ mat-option {
   }
 }
 
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+.form-row-item {
+  flex: 1;
+}
+
 .documento-fiscal-container {
   display: flex;
   flex-direction: row;

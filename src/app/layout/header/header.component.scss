@@ -32,11 +32,11 @@ header {
   gap: 16px;
 }
 
-button[mat-stroked-button] {
+button[mat-raised-button] {
   font-weight: 600;
 }
 
-button[mat-raised-button] {
+button[mat-stroked-button] {
   font-weight: 600;
 }
 

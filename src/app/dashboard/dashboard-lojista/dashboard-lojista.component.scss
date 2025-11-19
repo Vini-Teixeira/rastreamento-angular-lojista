@@ -42,7 +42,6 @@ h3 {
 
 :host ::ng-deep {
   .ngx-charts-pie-chart {
-    // Estiliza as etiquetas e valores
     .pie-label, .pie-label-line, text {
       fill: vars.$text-dark !important;
       font-family: vars.$font-stack !important;

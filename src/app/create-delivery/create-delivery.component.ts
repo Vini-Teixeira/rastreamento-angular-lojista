@@ -23,6 +23,7 @@ import {
 import { LojistasService, Lojista } from '../services/lojistas.service';
 import { EModoPagamento } from '../core/enums/pagamento.enum';
 import { ToastrService } from 'ngx-toastr';
+import { SocketService } from '../services/socket.service';
 //import { GeocodingService } from '../services/geocoding/geocoding.service';
 
 declare const google: any;
@@ -59,7 +60,8 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
   private entregasService = inject(EntregasService);
   private lojistasService = inject(LojistasService);
   private ngZone = inject(NgZone);
-  private toastr = inject(ToastrService)
+  private toastr = inject(ToastrService);
+  private socketService = inject(SocketService);
   //private geocodingService = inject(GeocodingService);
 
   public pagamentoOptions = [
@@ -251,9 +253,11 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
     this.entregasService.createDelivery(payload).subscribe({
       next: (novaEntrega) => {
         this.isLoading = false;
-        this.toastr.success(
+        this.socketService.addLocalNotification(
+          'SUCCESS',
+          'Entrega Criada',
           `Entrega #${novaEntrega.codigoEntrega} criada e enviada ao motorista.`,
-          'Entrega Criada com Sucesso'
+          novaEntrega
         );
         const currentDeliveryType = 
         this.deliveryForm.get('deliveryType')?.value || 'propria';

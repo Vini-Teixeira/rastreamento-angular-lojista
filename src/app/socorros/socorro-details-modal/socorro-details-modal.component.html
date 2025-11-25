@@ -1,19 +1,77 @@
-<h1 mat-dialog-title>Detalhes do Socorro</h1>
-<div mat-dialog-content>
-  <p>
-    Exibindo detalhes para o Socorro ID:
-    <strong>{{ socorro._id }}</strong>
-  </p>
-  <p>
-    Status: <strong>{{ socorro.status }}</strong>
-  </p>
-  <p>
-    Cliente: <strong>{{ socorro.clienteNome }}</strong>
-  </p>
-  <p>
-    Local: <strong>{{ socorro.clientLocation.address }}</strong>
-  </p>
+<div class="modal-header">
+  <h2 mat-dialog-title>Detalhes do Socorro</h2>
+  <button mat-icon-button (click)="onClose()" class="close-button">
+    <mat-icon>close</mat-icon>
+  </button>
 </div>
-<div mat-dialog-actions align="end">
-  <button mat-button (click)="onClose()">Fechar</button>
-</div>
+
+<mat-dialog-content class="modal-content">
+  <div class="details-container">
+    <h4>Informações</h4>
+    
+    <div class="info-item">
+      <span class="label">Status:</span>
+      <span class="value">{{ socorro.status | formatStatus }}</span>
+    </div>
+    
+    <div class="info-item">
+      <span class="label">Código:</span>
+      <span class="value code">{{ socorro.codigoSocorro }}</span>
+    </div>
+
+    <div class="info-item">
+      <span class="label">Cliente:</span>
+      <span class="value">{{ socorro.clienteNome }} ({{ socorro.clienteTelefone }})</span>
+    </div>
+
+    <div class="info-item" *ngIf="socorro.modeloVeiculo || socorro.placaVeiculo">
+      <span class="label">Veículo:</span>
+      <span class="value">{{ socorro.modeloVeiculo }} - {{ socorro.placaVeiculo }}</span>
+    </div>
+
+    <div class="info-item" *ngIf="socorro.serviceDescription">
+      <span class="label">Serviço:</span>
+      <span class="value">{{ socorro.serviceDescription }}</span>
+    </div>
+
+    <div class="info-item" *ngIf="socorro.driverId && typeof socorro.driverId === 'object'">
+      <span class="label">Profissional:</span>
+      <span class="value">{{ $any(socorro.driverId).nome }}</span>
+    </div>
+
+    <div class="info-item">
+      <span class="label">Local do Cliente:</span>
+      <span class="value">{{ socorro.clientLocation.address }}</span>
+    </div>
+    
+    <div class="info-item photos-section" *ngIf="socorro.fotos && socorro.fotos.length > 0">
+      <span class="label">Prova de Serviço:</span>
+      <div class="photos-grid">
+        <div 
+          *ngFor="let fotoUrl of socorro.fotos; let i = index" 
+          class="photo-thumbnail"
+          (click)="abrirFoto(fotoUrl)"
+          matTooltip="Clique para ampliar"
+        >
+          <img [src]="fotoUrl" alt="Foto {{ i + 1 }}" loading="lazy">
+        </div>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button
+        mat-stroked-button
+        color="warn" 
+        (click)="onCancelarSocorro()"
+        *ngIf="socorro.status !== SocorroStatus.COMPLETED && socorro.status !== SocorroStatus.CANCELLED"
+      >
+        <mat-icon>cancel</mat-icon>
+        Cancelar Socorro
+      </button>
+    </div>
+  </div>
+
+  <div class="map-container">
+    <app-mapa></app-mapa>
+  </div>
+</mat-dialog-content>

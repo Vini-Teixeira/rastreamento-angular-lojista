@@ -27,6 +27,7 @@ export interface Delivery {
   driverCurrentLocation?: GeoJsonPoint; 
   routeHistory?: GeoJsonPoint[];
   driverId?: { _id: string, nome: string } | string; 
+  fotosInstalacao?: string[];
 }
 
 export interface CreateDeliveryPayload {

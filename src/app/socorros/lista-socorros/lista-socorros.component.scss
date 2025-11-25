@@ -111,10 +111,11 @@ mat-paginator {
   background-color: #9b59b6;
 }
 
-.status-badge.status-concluído {
+.status-badge.status-finalizado {
   background-color: vars.$success; 
 }
 
-.status-badge.status-cancelado {
-  background-color: #e74c3c; 
+.status-badge.status-cancelado,
+.status-badge.status-unassigned {
+  background-color: #e74c3c;
 }

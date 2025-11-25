@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { AuthService } from './auth/auth.service';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Socorro } from '../models/socorro.model';
@@ -28,6 +29,7 @@ export interface CreateSocorroPayload {
 })
 export class SocorrosService {
   private http = inject(HttpClient);
+  private authService = inject(AuthService)
   private apiUrl = `${environment.apiUrl}/socorros`;
 
   private getNoCacheHeaders(): HttpHeaders {
@@ -57,5 +59,15 @@ export class SocorrosService {
       params = params.set('status', status)
     }
     return this.http.get<SocorroApiResponse>(this.apiUrl, { headers, params })
+  }
+
+  assignManual(socorroId: string, driverId: string): Observable<Socorro> {
+    const token = this.authService.getToken()
+    const body = { driverId: driverId }
+    return this.http.post<Socorro>(
+      `${this.apiUrl}/${socorroId}/assign-manual`,
+      body,
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
   }
 }

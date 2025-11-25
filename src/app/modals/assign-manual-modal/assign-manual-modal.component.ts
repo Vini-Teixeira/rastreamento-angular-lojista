@@ -11,6 +11,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { FormsModule } from '@angular/forms';
 import { EntregasService, Delivery } from '../../services/entregas.service';
+import { SocorrosService } from '../../services/socorro.service';
+import { Socorro } from '../../models/socorro.model';
 import {
   EntregadoresService,
   Entregador,
@@ -34,9 +36,10 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class AssignManualModalComponent implements OnInit {
   public dialogRef = inject(MatDialogRef<AssignManualModalComponent>);
-  public data: { entrega: Delivery } = inject(MAT_DIALOG_DATA);
+  public data: { entrega?: Delivery; socorro?: Socorro } = inject(MAT_DIALOG_DATA);
   private entregadoresService = inject(EntregadoresService);
   private entregasService = inject(EntregasService);
+  private socorrosService = inject(SocorrosService)
   private toastr = inject(ToastrService);
 
   // Estado da UI
@@ -72,30 +75,39 @@ export class AssignManualModalComponent implements OnInit {
   }
 
   onAssign(): void {
-    if (
-      !this.selectedDriverId ||
-      this.selectedDriverId.length === 0 ||
-      this.isSubmitting
-    ) {
+    if (!this.selectedDriverId || this.selectedDriverId.length === 0 || this.isSubmitting) {
       return;
     }
-
+    
     this.isSubmitting = true;
     this.error = null;
     const driverIdToSend = this.selectedDriverId[0];
 
-    this.entregasService
-      .assignManual(this.data.entrega._id, driverIdToSend)
-      .subscribe({
-        next: (updatedDelivery) => {
-          this.toastr.success('Entregador atribuído com sucesso!');
-          this.dialogRef.close(true);
-        },
-        error: (err) => {
-          this.error = err.error?.message || 'Falha ao atribuir entregador.';
-          this.isSubmitting = false;
-        },
-      });
+    if (this.data.entrega) {
+      this.entregasService
+        .assignManual(this.data.entrega._id, driverIdToSend)
+        .subscribe({
+           next: () => this.handleSuccess(),
+           error: (err) => this.handleError(err)
+        });
+    } else if (this.data.socorro) {
+      this.socorrosService
+        .assignManual(this.data.socorro._id, driverIdToSend)
+        .subscribe({
+           next: () => this.handleSuccess(),
+           error: (err) => this.handleError(err)
+        });
+    }
+  }
+
+  private handleSuccess() {
+    this.toastr.success('Entregador atribuído com sucesso')
+    this.dialogRef.close(true)
+  }
+
+  private handleError(err: any) {
+    this.error = err.error?.message || 'Falha ao atribuir Entregador'
+    this.isSubmitting= false
   }
 
   onCancel(): void {

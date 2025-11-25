@@ -50,6 +50,18 @@
         <th mat-header-cell *matHeaderCellDef>Ações</th>
         <td mat-cell *matCellDef="let element">
           <button
+            *ngIf="element.status?.toUpperCase() === 'UNASSIGNED'"
+            mat-flat-button
+            color="warn"
+            (click)="abrirModalAtribuicao(element)"
+            matTooltip="Ação necessária: Atribuir entregador"
+          >
+            <mat-icon>person_add</mat-icon>
+            Atribuir
+          </button>
+
+          <button
+            *ngIf="element.status?.toUpperCase() !== 'UNASSIGNED'"
             mat-icon-button
             (click)="abrirModalDetalhes(element)"
             matTooltip="Ver detalhes do socorro"

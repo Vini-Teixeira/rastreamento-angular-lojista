@@ -313,8 +313,11 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
 
 
   private getCoords(coords: CoordsTuple): LatLng {
-    // GeoJSON é [lng, lat], Google Maps é { lat, lng }
     return { lat: coords[1], lng: coords[0] };
+  }
+
+  abrirFoto(url: string): void {
+    window.open(url, '_blank');
   }
 
   onLiberarCheckIn(): void {

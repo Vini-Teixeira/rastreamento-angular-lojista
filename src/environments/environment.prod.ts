@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://rastreamento.entregas.com',
+  apiUrl: 'rastreamento-nestjs-back-production.up.railway.app',
   googleMapsApiKey: 'AIzaSyAsfBKGYP5fEfpFvz-ymeXiCoGRvqbsn-M'
 };

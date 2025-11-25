@@ -37,7 +37,7 @@ import { AssignManualModalComponent } from '../../modals/assign-manual-modal/ass
     MatProgressSpinnerModule,
     MatTooltipModule,
     FormatStatusPipe,
-    AssignManualModalComponent,
+   // AssignManualModalComponent,
   ],
   templateUrl: './lista-entregas.component.html',
   styleUrls: ['./lista-entregas.component.scss'],

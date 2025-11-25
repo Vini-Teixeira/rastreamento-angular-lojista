@@ -2,7 +2,7 @@
 <mat-dialog-content>
   <p>
     Selecione um entregador disponível para a entrega
-    <strong>#{{ data.entrega.codigoEntrega }}</strong>.
+    <strong>#{{ data.entrega?.codigoEntrega || data.socorro?.codigoSocorro }}</strong>.
   </p>
 
   <div *ngIf="isLoadingDrivers" class="loading-container">

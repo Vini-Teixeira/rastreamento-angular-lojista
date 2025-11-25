@@ -122,6 +122,33 @@ export class SocketService {
     });
   }
 
+  public addLocalNotification(
+    tipo: 'SUCCESS' | 'INFO' | 'WARNING' | 'ERROR',
+    titulo: string,
+    mensagem: string,
+    payload?: any
+  ): void {
+    const newNotification: Notification = {
+      id: 'local-' + new Date().getTime(),
+      tipo: tipo,
+      titulo: titulo,
+      mensagem: mensagem,
+      delivery: payload,
+      timestamp: new Date(),
+      read: false,
+    };
+
+    const currentNotifications = this.notificationsSubject.value;
+    const newNotifications = [newNotification, ...currentNotifications];
+
+    this.notificationsSubject.next(newNotifications);
+    this.saveNotificationsToStorage(newNotifications);
+    this.recalculateUnreadCount();
+    
+    // Dispara o Toastr visual/sonoro
+    this.triggerToast(newNotification);
+  }
+
   private triggerToast(notification: Notification): void {
     const title = notification.titulo;
     const message = notification.mensagem;

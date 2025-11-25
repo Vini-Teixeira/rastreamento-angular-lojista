@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl:'http://localhost:3000',
+  apiUrl:'rastreamento-nestjs-back-production.up.railway.app',
   googleMapsApiKey: 'AIzaSyAsfBKGYP5fEfpFvz-ymeXiCoGRvqbsn-M'
 };

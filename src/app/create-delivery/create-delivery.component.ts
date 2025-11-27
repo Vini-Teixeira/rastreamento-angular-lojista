@@ -83,7 +83,7 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
       deliveryType: ['propria', Validators.required],
       origemId: [null],
       destinationAddress: ['', Validators.required],
-      destinationCoords: [null, Validators.required],
+      destinationCoords: [null, /*Validators.required*/],
       itemDescription: ['', [Validators.required, Validators.minLength(3)]],
       clienteNome: ['', Validators.required],
       clienteTelefone: ['', [Validators.required]],
@@ -213,6 +213,7 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.deliveryForm.invalid || this.isLoading) {
+      
       this.deliveryForm.markAllAsTouched();
       if (this.deliveryForm.get('destinationCoords')?.invalid) {
         this.errorMessage =

@@ -81,7 +81,7 @@ export class SolicitarSocorroComponent implements OnInit, OnDestroy {
     const sub = this.socorroForm
       .get('address')
       ?.valueChanges.pipe(
-        debounceTime(80),
+        debounceTime(700),
         distinctUntilChanged(),
         tap((value) => {
           if (

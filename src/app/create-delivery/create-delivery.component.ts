@@ -107,7 +107,7 @@ export class CreateDeliveryComponent implements OnInit, OnDestroy {
     const sub = this.deliveryForm
       .get('destinationAddress')
       ?.valueChanges.pipe(
-        debounceTime(80),
+        debounceTime(700),
         distinctUntilChanged(),
         tap((value) => this.getAutocompleteSuggestions(value))
       )

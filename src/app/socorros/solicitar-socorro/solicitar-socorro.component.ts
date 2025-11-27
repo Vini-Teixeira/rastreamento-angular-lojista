@@ -67,8 +67,9 @@ export class SolicitarSocorroComponent implements OnInit, OnDestroy {
       placaVeiculo: [''],
       modeloVeiculo: [''],
       serviceDescription: [''],
-    });{
-      validators: [this.addressOrCoordsValidator()]
+    });
+    {
+      validators: [this.addressOrCoordsValidator()];
     }
     this.setupAddressAutocomplete();
   }
@@ -154,7 +155,7 @@ export class SolicitarSocorroComponent implements OnInit, OnDestroy {
               {
                 address: place.formatted_address,
               },
-              { 
+              {
                 emitEvent: false,
               }
             );
@@ -164,7 +165,7 @@ export class SolicitarSocorroComponent implements OnInit, OnDestroy {
               lng: place.geometry?.location?.lng(),
             };
             this.socorroForm.patchValue({ destinationCoords: coords });
-            this.isSelectingSuggestion = false
+            this.isSelectingSuggestion = false;
           }
         });
       }
@@ -210,17 +211,16 @@ export class SolicitarSocorroComponent implements OnInit, OnDestroy {
   }
 
   private addressOrCoordsValidator() {
-  return (formGroup: FormGroup) => {
-    const address = formGroup.get('address')?.value;
-    const coords = formGroup.get('destinationCoords')?.value;
-    if (coords && coords.lat && coords.lng) {
-      return null;
-    }
-    if (address && address.length >= 8) {
-      return null;
-    }
-    return { addressInvalid: true };
-  };
-}
-
+    return (formGroup: FormGroup) => {
+      const address = formGroup.get('address')?.value;
+      const coords = formGroup.get('destinationCoords')?.value;
+      if (coords && coords.lat && coords.lng) {
+        return null;
+      }
+      if (address && address.length >= 8) {
+        return null;
+      }
+      return { addressInvalid: true };
+    };
+  }
 }

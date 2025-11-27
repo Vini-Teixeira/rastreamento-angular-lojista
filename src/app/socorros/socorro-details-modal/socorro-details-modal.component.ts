@@ -3,6 +3,7 @@ import {
   inject,
   OnInit,
   OnDestroy,
+  AfterViewInit,
   ViewChild,
   ChangeDetectorRef,
 } from '@angular/core';
@@ -48,7 +49,7 @@ type CoordsTuple = [number, number];
   templateUrl: './socorro-details-modal.component.html',
   styleUrls: ['./socorro-details-modal.component.scss'],
 })
-export class SocorroDetailsModalComponent implements OnInit, OnDestroy {
+export class SocorroDetailsModalComponent implements OnInit, OnDestroy, AfterViewInit {
   private socorrosService = inject(SocorrosService);
   private snackBar = inject(MatSnackBar);
   private socketService = inject(SocketService);
@@ -72,25 +73,28 @@ export class SocorroDetailsModalComponent implements OnInit, OnDestroy {
   private readonly RECALCULATE_ROUTE_INTERVAL_MS: number = 30000;
 
   ngOnInit(): void {
-    // 1. Configura coordenadas iniciais
     this.coordsCliente = this.getCoords(
       this.socorro.clientLocation.coordinates.coordinates
     );
-
-    // (Socorro geralmente não tem locationHistory salvo no objeto principal
-    //  da mesma forma que entrega, a menos que tenhamos adicionado. 
-    //  Se tiver driverCurrentLocation, usamos.)
     if (this.socorro.driverId && typeof this.socorro.driverId === 'object') {
-        // Se o objeto driver vier populado com localização, poderíamos usar.
-        // Mas vamos confiar no Socket para a primeira atualização.
     }
-
-    this.socketService.joinDeliveryRoom(this.socorro._id); // Usa o mesmo método (sala por ID)
+    this.socketService.joinDeliveryRoom(this.socorro._id);
     this.listenForUpdates();
 
-    setTimeout(() => {
+    /*setTimeout(() => {
       this.drawRouteByStatus(this.socorro.status);
-    }, 500);
+    }, 500);*/
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      if (this.mapaComponent) {
+        console.log('Iniciando mapa do Socorro...');
+        this.drawRouteByStatus(this.socorro.status);
+      } else {
+        console.warn('MapaComponent ainda não disponível no AfterViewInit.');
+      }
+    }, 400);
   }
 
   ngOnDestroy(): void {
@@ -103,24 +107,17 @@ export class SocorroDetailsModalComponent implements OnInit, OnDestroy {
   }
 
   private listenForUpdates(): void {
-    // 1. Status Update (socorro_updated)
     const statusSub = this.socketService.socorroUpdated$
       .pipe(filter((data) => data && data.socorroId === this.socorro._id))
       .subscribe((data) => {
         console.log('[Socorro Modal] Status Atualizado:', data.status);
         this.socorro.status = data.status;
-        
-        // Se o payload vier com localização, atualizamos
         if (data.payload?.driverCurrentLocation) {
-             // Lógica similar à de entrega se o backend mandar
         }
 
         this.drawRouteByStatus(data.status);
         this.cdr.detectChanges();
       });
-
-    // 2. Location Update (novaLocalizacao)
-    // O backend emite 'novaLocalizacao' com 'deliveryId' igual ao ID do socorro
     const locationSub = this.socketService.locationUpdated$
       .pipe(filter((data) => data && data.deliveryId === this.socorro._id))
       .subscribe((data) => {
@@ -149,13 +146,9 @@ export class SocorroDetailsModalComponent implements OnInit, OnDestroy {
 
   private drawRouteByStatus(status: string): void {
     if (!this.mapaComponent) return;
-    
-    // Normaliza status para comparar com Enum
     const statusUpper = status.toUpperCase();
-
     this.mapaComponent.clearDynamicElements();
     this.lastPlannedRouteFetch = Date.now();
-    
     this.setStaticMarkers();
 
     if (this.coordsEntregador) {
@@ -165,25 +158,18 @@ export class SocorroDetailsModalComponent implements OnInit, OnDestroy {
     if (this.localRouteHistory.length > 0) {
       this.mapaComponent.drawHistoryPolyline(this.localRouteHistory, 'gray');
     }
-
     this.drawPlannedRoutes(statusUpper);
-
-    // Fit bounds
     let boundsCoords = [this.coordsCliente];
     if (this.coordsEntregador) {
       boundsCoords.push(this.coordsEntregador);
     }
-    // Se só tiver o cliente, o fitBounds centraliza nele.
     this.mapaComponent.fitBounds(boundsCoords);
   }
 
   private drawPlannedRoutes(status: string): void {
     if (!this.mapaComponent) return;
-
-    // Lógica de Rota para Socorro
     if (status === 'A_CAMINHO' || status === 'ACEITO' || status === 'EM_DESLOCAMENTO') {
         if (this.coordsEntregador) {
-            // Rota: Entregador -> Cliente (Azul/Verde)
             this.fetchAndDrawPolyline(
                 this.coordsEntregador,
                 this.coordsCliente,
@@ -195,7 +181,6 @@ export class SocorroDetailsModalComponent implements OnInit, OnDestroy {
 
   private updateDynamicRoutes(status: string): void {
     if (!this.mapaComponent || !this.coordsEntregador) return;
-
     const now = Date.now();
     if (now - this.lastPlannedRouteFetch > this.RECALCULATE_ROUTE_INTERVAL_MS) {
       this.drawRouteByStatus(status);
@@ -213,7 +198,6 @@ export class SocorroDetailsModalComponent implements OnInit, OnDestroy {
     destination: LatLng,
     color: 'orange' | 'blue' | 'green' | 'lightskyblue',
   ): void {
-     // Reutiliza a mesma lógica do modal de entregas
      if (!origin || !destination) return;
      this.geocodingService.getDirections(origin, destination).subscribe({
         next: (res) => {

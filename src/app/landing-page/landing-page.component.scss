@@ -108,15 +108,6 @@ header {
       opacity: 1 !important;
 
       &.btn-login {
-        background: $secondary;
-        color: white;
-
-        &:hover {
-          background: $secondary-dark;
-        }
-      }
-
-      &.btn-registrar {
         background: $primary;
         color: white;
 
@@ -124,6 +115,15 @@ header {
           background: $primary-dark;
         }
       }
+
+      /*&.btn-registrar {
+        background: $primary;
+        color: white;
+
+        &:hover {
+          background: $primary-dark;
+        }
+      }*/
     }
   }
 }

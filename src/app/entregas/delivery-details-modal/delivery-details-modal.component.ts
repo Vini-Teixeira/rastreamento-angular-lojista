@@ -3,6 +3,7 @@ import {
   inject,
   OnInit,
   OnDestroy,
+  AfterViewInit,
   ViewChild,
   ChangeDetectorRef,
 } from '@angular/core';
@@ -26,6 +27,14 @@ import { SocketService } from '../../services/socket.service';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
+const isDeliveryActive = (status: DeliveryStatus): boolean => {
+  return (
+    status !== DeliveryStatus.FINALIZADO &&
+    status !== DeliveryStatus.CANCELADO &&
+    status !== DeliveryStatus.PENDENTE
+  )
+}
+
 type CoordsTuple = [number, number];
 
 @Component({
@@ -42,7 +51,7 @@ type CoordsTuple = [number, number];
   templateUrl: './delivery-details-modal.component.html',
   styleUrls: ['./delivery-details-modal.component.scss'],
 })
-export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
+export class DeliveryDetailsModalComponent implements OnInit, OnDestroy, AfterViewInit {
   // --- Injeção de Dependências ---
   private entregasService = inject(EntregasService);
   private snackBar = inject(MatSnackBar);
@@ -62,9 +71,10 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
   private coordsEntregador: LatLng | null = null;
   private localRouteHistory: LatLng[] = [];
 
-  // --- ✨ LÓGICA DE THROTTLE (CUSTO/UX) ✨ ---
   private lastPlannedRouteFetch: number = 0;
-  private readonly RECALCULATE_ROUTE_INTERVAL_MS: number = 30000; // 30 segundos
+  private readonly RECALCULATE_ROUTE_INTERVAL_MS: number = 30000;
+
+  private hasFittedBounds: boolean = false
 
   ngOnInit(): void {
     this.coordsLoja = this.getCoords(
@@ -78,20 +88,25 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
         this.entrega.driverCurrentLocation.coordinates,
       );
     }
-    // Inicializa o histórico local com o que veio da API
     if (this.entrega.routeHistory && this.entrega.routeHistory.length > 0) {
       this.localRouteHistory = this.entrega.routeHistory.map((p) =>
         this.getCoords(p.coordinates),
       );
     }
-
     this.socketService.joinDeliveryRoom(this.entrega._id);
     this.listenForUpdates();
-
     setTimeout(() => {
-      // O drawRouteByStatus fará o "Full Redraw" inicial
       this.drawRouteByStatus(this.entrega.status);
-    }, 500); // 500ms para garantir que o @ViewChild(MapaComponent) esteja pronto
+    }, 500);
+  }
+
+  ngAfterViewInit(): void {
+    this.dialogRef.afterOpened().subscribe(() => {
+      if(this.mapaComponent) {
+        this.drawRouteByStatus(this.entrega.status)
+        this.hasFittedBounds = true
+      }
+    })
   }
 
   ngOnDestroy(): void {
@@ -104,24 +119,28 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
     const statusSub = this.socketService.deliveryUpdated$
       .pipe(filter((data) => data && data.deliveryId === this.entrega._id))
       .subscribe((data) => {
-        console.log('STATUS ATUALIZADO (WS):', data.status);
         this.entrega.status = data.status;
-        
+        if (!isDeliveryActive(this.entrega.status)) {
+            this.mapaComponent.clearDynamicElements();
+            this.mapaComponent.updateDriverMarker(null as any);
+            this.socketService.leaveDeliveryRoom(this.entrega._id);
+            this.snackBar.open('Entrega finalizada. Rastreamento encerrado.', 'OK', { duration: 5000 });
+            return;
+        }
         if (data.payload?.driverCurrentLocation) {
           this.coordsEntregador = this.getCoords(
             data.payload.driverCurrentLocation.coordinates,
           );
         }
-        
-        // Um "Full Redraw" é necessário, pois o status mudou
+        this.hasFittedBounds = false;
         this.drawRouteByStatus(data.status);
-        this.cdr.detectChanges(); // Força a detecção de mudanças
+        this.cdr.detectChanges();
       });
-
     // --- OUVINTE DE PULSO DE LOCALIZAÇÃO ---
     const locationSub = this.socketService.locationUpdated$
       .pipe(filter((data) => data && data.deliveryId === this.entrega._id))
       .subscribe((data) => {
+        if (!isDeliveryActive(this.entrega.status)) return;
         if (!data.location?.coordinates) return;
 
         // 1. Atualiza os dados locais
@@ -132,9 +151,8 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
           );
         }
 
-        // 2. Chama o método de atualização dinâmica (que tem o throttle)
         this.updateDynamicRoutes(this.entrega.status);
-        this.cdr.detectChanges(); // Força a detecção de mudanças
+        this.cdr.detectChanges();
       });
 
     this.subscriptions.add(statusSub);
@@ -154,30 +172,28 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
   private drawRouteByStatus(status: DeliveryStatus): void {
     if (!this.mapaComponent) return;
     console.log(`[Angular] FULL REDRAW (Status: ${status})`);
-
-    // 1. Limpa tudo (marcadores dinâmicos e polylines)
     this.mapaComponent.clearDynamicElements();
-    
-    // 2. Reseta o timer da rota planejada
-    this.lastPlannedRouteFetch = Date.now();
-    
-    // 3. Desenha marcadores estáticos (Loja, Cliente)
-    this.setStaticMarkers();
+        this.lastPlannedRouteFetch = Date.now();
+        this.setStaticMarkers();
 
-    // 4. Desenha o marcador do motorista (se já existir)
     if (this.coordsEntregador) {
       this.mapaComponent.updateDriverMarker(this.coordsEntregador);
     }
 
-    // 5. Desenha o histórico de rota (se já existir)
     if (this.localRouteHistory.length > 0) {
       this.mapaComponent.drawHistoryPolyline(this.localRouteHistory, 'gray');
     }
-
-    // 6. Desenha as rotas planejadas (a chamada "cara")
     this.drawPlannedRoutes(status);
 
-    // 7. Ajusta o zoom para caber tudo
+    if (!this.hasFittedBounds) {
+        let boundsCoords = [this.coordsLoja, this.coordsCliente];
+        if (this.coordsEntregador) {
+          boundsCoords.push(this.coordsEntregador);
+        }
+        this.mapaComponent.fitBounds(boundsCoords);
+        this.hasFittedBounds = true; // Trava o zoom
+    }
+
     let boundsCoords = [this.coordsLoja, this.coordsCliente];
     if (this.coordsEntregador) {
       boundsCoords.push(this.coordsEntregador);
@@ -214,17 +230,16 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
             this.coordsLoja,
             this.coordsCliente,
             'lightskyblue',
-            undefined, // sem callback
-            true // Dotted
+            undefined,
+            true
           );
         } else {
-          // Fallback se o entregador aceitou mas ainda não temos a localização
            this.fetchAndDrawPolyline(
             this.coordsLoja,
             this.coordsCliente,
             'lightskyblue',
             undefined,
-            true // Dotted
+            true
           );
         }
         break;
@@ -261,23 +276,11 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
 
     const now = Date.now();
 
-    // Verifica se o tempo de throttle passou
     if (now - this.lastPlannedRouteFetch > this.RECALCULATE_ROUTE_INTERVAL_MS) {
-      // --- CAMINHO "CARO" (A cada 30s) ---
-      // Faz o "Full Redraw" para recalcular a rota planejada
-      // console.log('[Angular] THROTTLE: Recalculando rota planejada (30s).');
       this.drawRouteByStatus(status);
     } else {
-      // --- CAMINHO "GRÁTIS" (A cada pulso) ---
-      // Apenas atualiza o marcador e a linha cinza
-      
-      // 1. Atualiza o marcador do motorista
       this.mapaComponent.updateDriverMarker(this.coordsEntregador);
-      
-      // 2. Limpa a linha cinza ANTIGA
       this.mapaComponent.clearHistoryPolylines(); 
-
-      // 3. Desenha a linha cinza NOVA
       if (this.localRouteHistory.length > 1) {
         // console.log(`[Angular] FAST DRAW: Histórico com ${this.localRouteHistory.length} pontos.`);
         this.mapaComponent.drawHistoryPolyline(this.localRouteHistory, 'gray');
@@ -292,7 +295,6 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
     callback?: (polyline: string) => void,
     dotted: boolean = false,
   ): void {
-    // Adiciona uma verificação para não chamar a API se a origem ou destino forem inválidos
     if (!origin || !destination) {
       console.warn("fetchAndDrawPolyline: Origem ou destino inválidos.", { origin, destination });
       return;
@@ -351,7 +353,7 @@ export class DeliveryDetailsModalComponent implements OnInit, OnDestroy {
         this.snackBar.open('Entrega cancelada com sucesso.', 'Fechar', {
           duration: 3000,
         });
-        this.dialogRef.close(true); // Fecha o modal após o sucesso
+        this.dialogRef.close(true);
       },
       error: (err) => {
         this.snackBar.open(

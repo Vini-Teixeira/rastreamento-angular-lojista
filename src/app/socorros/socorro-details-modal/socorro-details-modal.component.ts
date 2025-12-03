@@ -20,8 +20,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MapaComponent } from '../../mapa/mapa.component';
 import { SocorrosService } from '../../services/socorro.service';
 import { Socorro } from '../../models/socorro.model';
-import { DeliveryStatus } from '../../core/enums/delivery-status.enum';
-import { SocorroStatus } from '../../core/enums/socorro-status.enum';
+import { SocorroStatus } from '../../core/enums/socorro-status.enum'; // Garanta que este enum existe
 import { FormatStatusPipe } from '../../shared/pipes/format-status.pipe';
 import {
   GeocodingService,
@@ -31,9 +30,11 @@ import { SocketService } from '../../services/socket.service';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
-// Função auxiliar para verificar status ativo (Reutilizável ou adaptada para Socorro)
+// Helper para saber se o mapa deve continuar atualizando
 const isSocorroActive = (status: string): boolean => {
-  return status !== 'FINALIZADO' && status !== 'CANCELADO';
+  return (
+    status !== 'FINALIZADO' && status !== 'CANCELADO' && status !== 'REJEITADO'
+  );
 };
 
 type CoordsTuple = [number, number];
@@ -57,6 +58,7 @@ type CoordsTuple = [number, number];
 export class SocorroDetailsModalComponent
   implements OnInit, OnDestroy, AfterViewInit
 {
+  // --- Injeção de Dependências ---
   private socorrosService = inject(SocorrosService);
   private snackBar = inject(MatSnackBar);
   private socketService = inject(SocketService);
@@ -65,53 +67,59 @@ export class SocorroDetailsModalComponent
 
   public dialogRef = inject(MatDialogRef<SocorroDetailsModalComponent>);
   public socorro: Socorro = inject(MAT_DIALOG_DATA);
-  public DeliveryStatus = DeliveryStatus;
+
+  // Disponibiliza o Enum para o HTML se necessário
   public SocorroStatus = SocorroStatus;
 
   @ViewChild(MapaComponent) private mapaComponent!: MapaComponent;
 
   private subscriptions = new Subscription();
 
+  // --- Coordenadas ---
   private coordsCliente!: LatLng;
   private coordsEntregador: LatLng | null = null;
   private localRouteHistory: LatLng[] = [];
 
+  // --- Controle de Performance e UX ---
   private lastPlannedRouteFetch: number = 0;
-  private readonly RECALCULATE_ROUTE_INTERVAL_MS: number = 30000;
-
-  // Flag para controlar o Zoom inicial
-  private hasFittedBounds: boolean = false;
+  private readonly RECALCULATE_ROUTE_INTERVAL_MS: number = 30000; // 30s
+  private hasFittedBounds: boolean = false; // Impede o zoom de ficar pulando
 
   ngOnInit(): void {
-    // 1. Coordenadas do Cliente (Obrigatórias)
+    // 1. Extrai coordenadas do Cliente
     this.coordsCliente = this.getCoords(
       this.socorro.clientLocation.coordinates.coordinates
     );
 
-    // 2. Tenta extrair localização inicial do motorista (Correção do Mapa Pelado)
+    // 2. Tenta extrair coordenadas iniciais do Motorista (se vier populado)
+    // Verifica se driverId é objeto e tem location ou se veio no payload de criação
     if (this.socorro.driverId && typeof this.socorro.driverId === 'object') {
-      const driverAny = this.socorro.driverId as any;
-      if (driverAny.localizacao && driverAny.localizacao.coordinates) {
+      const driverObj = this.socorro.driverId as any;
+      if (driverObj.localizacao?.coordinates) {
         this.coordsEntregador = this.getCoords(
-          driverAny.localizacao.coordinates
+          driverObj.localizacao.coordinates
         );
       }
     }
+    // Fallback: Verifica se o objeto socorro raiz tem 'driverCurrentLocation' (nosso patch do backend)
+    else if ((this.socorro as any).driverCurrentLocation?.coordinates) {
+      this.coordsEntregador = this.getCoords(
+        (this.socorro as any).driverCurrentLocation.coordinates
+      );
+    }
 
-    // 3. Socket
+    // 3. Conecta ao Socket
     this.socketService.joinDeliveryRoom(this.socorro._id);
     this.listenForUpdates();
   }
 
   ngAfterViewInit(): void {
-    // Correção Definitiva do IntersectionObserver: Usa afterOpened
+    // Espera o Modal abrir para iniciar o mapa (Resolve erro IntersectionObserver)
     this.dialogRef.afterOpened().subscribe(() => {
       if (this.mapaComponent) {
         console.log('🚑 Modal Socorro aberto. Iniciando mapa...');
         this.drawRouteByStatus(this.socorro.status);
-        this.hasFittedBounds = true; // Marca que já ajustou zoom inicial
-      } else {
-        console.warn('MapaComponent não encontrado.');
+        this.hasFittedBounds = true; // Marca zoom inicial como feito
       }
     });
   }
@@ -126,41 +134,42 @@ export class SocorroDetailsModalComponent
   }
 
   private listenForUpdates(): void {
-    // --- Atualização de Status ---
+    // --- Evento de Mudança de Status ---
     const statusSub = this.socketService.socorroUpdated$
       .pipe(filter((data) => data && data.socorroId === this.socorro._id))
       .subscribe((data) => {
-        console.log('🔥 [SOCKET DEBUG] Payload Interno:', JSON.stringify(data.payload, null, 2));
+        console.log('[Socorro Modal] Status Atualizado:', data.status);
         this.socorro.status = data.status;
 
-        // Kill Switch visual
+        // Kill Switch: Se acabou, para de atualizar o mapa
         if (!isSocorroActive(this.socorro.status)) {
           this.mapaComponent.clearDynamicElements();
           this.mapaComponent.updateDriverMarker(null as any);
           this.socketService.leaveDeliveryRoom(this.socorro._id);
+          this.snackBar.open('Socorro finalizado/cancelado.', 'OK', {
+            duration: 4000,
+          });
           return;
         }
-        const driverLoc = data.payload?.driverCurrentLocation || data.driverCurrentLocation;
 
+        // Atualiza posição se vier no payload do status
+        // (Tentativa resiliente de pegar de payload.driverCurrentLocation OU raiz)
+        const driverLoc =
+          data.payload?.driverCurrentLocation || data.driverCurrentLocation;
         if (driverLoc?.coordinates) {
-            console.log('✅ Localização encontrada no socket:', driverLoc);
-            this.coordsEntregador = this.getCoords(driverLoc.coordinates);
-        } else {
-            console.warn('⚠️ Objeto de localização não encontrado no evento:', data);
+          this.coordsEntregador = this.getCoords(driverLoc.coordinates);
         }
 
-        if (data.payload?.driverCurrentLocation) {
-          this.coordsEntregador = this.getCoords(
-            data.payload.driverCurrentLocation.coordinates
-          );
-        }
+        // Status mudou -> Pode refazer o fitBounds se quiser (opcional)
+        // this.hasFittedBounds = false;
 
-        this.hasFittedBounds = false;
         this.drawRouteByStatus(data.status);
         this.cdr.detectChanges();
       });
 
+    // --- Evento de GPS (Movimento) ---
     const locationSub = this.socketService.locationUpdated$
+      // Filtro relaxado: confia na sala do socket, verifica se tem location
       .pipe(filter((data) => data && data.location))
       .subscribe((data) => {
         if (!isSocorroActive(this.socorro.status)) return;
@@ -184,40 +193,51 @@ export class SocorroDetailsModalComponent
 
   private setStaticMarkers(): void {
     if (!this.mapaComponent) return;
+    // Socorro: Não tem loja (null), tem Cliente.
     this.mapaComponent.setStaticMarkers(null as any, this.coordsCliente);
   }
 
   private drawRouteByStatus(status: string): void {
     if (!this.mapaComponent) return;
-    const statusUpper = status.toUpperCase();
 
+    // Limpa e prepara
     this.mapaComponent.clearDynamicElements();
     this.lastPlannedRouteFetch = Date.now();
     this.setStaticMarkers();
 
+    // Desenha Entregador
     if (this.coordsEntregador) {
       this.mapaComponent.updateDriverMarker(this.coordsEntregador);
     }
 
+    // Desenha Histórico (Rastro cinza)
     if (this.localRouteHistory.length > 0) {
       this.mapaComponent.drawHistoryPolyline(this.localRouteHistory, 'gray');
     }
 
-    this.drawPlannedRoutes(statusUpper);
+    // Desenha Rota Planejada (Linha Colorida)
+    this.drawPlannedRoutes(status);
 
+    // Zoom Inteligente (Só na primeira vez ou reset forçado)
     if (!this.hasFittedBounds) {
       let boundsCoords = [this.coordsCliente];
       if (this.coordsEntregador) {
         boundsCoords.push(this.coordsEntregador);
       }
-      this.mapaComponent.fitBounds(boundsCoords);
-      this.hasFittedBounds = true;
+      // Se só tiver o cliente, não quebra o fitBounds
+      if (boundsCoords.length > 0) {
+        this.mapaComponent.fitBounds(boundsCoords);
+        this.hasFittedBounds = true;
+      }
     }
   }
 
   private drawPlannedRoutes(status: string): void {
     if (!this.mapaComponent) return;
     const currentStatus = status?.toUpperCase() || '';
+
+    // Lógica Simplificada para Socorro:
+    // Se o entregador aceitou, traça rota direta dele até o cliente.
     const activeStatuses = [
       'ACEITO',
       'A_CAMINHO',
@@ -227,17 +247,11 @@ export class SocorroDetailsModalComponent
 
     if (activeStatuses.includes(currentStatus)) {
       if (this.coordsEntregador && this.coordsCliente) {
-        console.log('🚑 Desenhando rota Socorro: Motorista -> Cliente');
         this.fetchAndDrawPolyline(
           this.coordsEntregador,
           this.coordsCliente,
-          'green'
+          'green' // Verde = Destino Final
         );
-      } else {
-        console.warn('Faltando coordenadas para traçar rota de socorro:', {
-          motorista: this.coordsEntregador,
-          cliente: this.coordsCliente,
-        });
       }
     }
   }
@@ -246,9 +260,11 @@ export class SocorroDetailsModalComponent
     if (!this.mapaComponent || !this.coordsEntregador) return;
     const now = Date.now();
 
+    // Throttle de 30s para rota planejada (Google API $$)
     if (now - this.lastPlannedRouteFetch > this.RECALCULATE_ROUTE_INTERVAL_MS) {
       this.drawRouteByStatus(status);
     } else {
+      // Fast Update: Só move o ícone e atualiza rastro cinza
       this.mapaComponent.updateDriverMarker(this.coordsEntregador);
       this.mapaComponent.clearHistoryPolylines();
       if (this.localRouteHistory.length > 1) {
@@ -283,6 +299,8 @@ export class SocorroDetailsModalComponent
   }
 
   onCancelarSocorro(): void {
+    // Implemente sua lógica de cancelamento aqui
     if (!confirm('Tem certeza que deseja cancelar este socorro?')) return;
+    // this.socorrosService.cancelar...
   }
 }

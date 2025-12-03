@@ -130,7 +130,7 @@ export class SocorroDetailsModalComponent
     const statusSub = this.socketService.socorroUpdated$
       .pipe(filter((data) => data && data.socorroId === this.socorro._id))
       .subscribe((data) => {
-        console.log('[Socorro Modal] Status Atualizado:', data.status);
+        console.log('🔥 [SOCKET DEBUG] Payload Interno:', JSON.stringify(data.payload, null, 2));
         this.socorro.status = data.status;
 
         // Kill Switch visual
@@ -140,22 +140,27 @@ export class SocorroDetailsModalComponent
           this.socketService.leaveDeliveryRoom(this.socorro._id);
           return;
         }
+        const driverLoc = data.payload?.driverCurrentLocation || data.driverCurrentLocation;
+
+        if (driverLoc?.coordinates) {
+            console.log('✅ Localização encontrada no socket:', driverLoc);
+            this.coordsEntregador = this.getCoords(driverLoc.coordinates);
+        } else {
+            console.warn('⚠️ Objeto de localização não encontrado no evento:', data);
+        }
 
         if (data.payload?.driverCurrentLocation) {
-          // Atualiza se vier no payload do status
           this.coordsEntregador = this.getCoords(
             data.payload.driverCurrentLocation.coordinates
           );
         }
 
-        this.hasFittedBounds = false; // Permite reajuste de zoom se o status mudar
+        this.hasFittedBounds = false;
         this.drawRouteByStatus(data.status);
         this.cdr.detectChanges();
       });
 
-    // --- Atualização de Localização (GPS) ---
     const locationSub = this.socketService.locationUpdated$
-      // Relaxei o filtro de ID aqui igual fizemos na Entrega, confiando na sala
       .pipe(filter((data) => data && data.location))
       .subscribe((data) => {
         if (!isSocorroActive(this.socorro.status)) return;

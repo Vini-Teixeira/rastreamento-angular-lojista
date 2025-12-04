@@ -91,18 +91,6 @@
         mat-stroked-button
         color="warn"
         (click)="onCancelarSocorro()"
-        *ngIf="
-          socorro.status !== SocorroStatus.FINALIZADO &&
-          socorro.status !== SocorroStatus.CANCELLED
-        "
-      >
-        <mat-icon>cancel</mat-icon>
-        Cancelar Socorro
-      </button>
-      <button
-        mat-stroked-button
-        color="warn"
-        (click)="onCancelarSocorro()"
         *ngIf="socorro.status !== SocorroStatus.FINALIZADO"
       >
         <mat-icon>cancel</mat-icon>

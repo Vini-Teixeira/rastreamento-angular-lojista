@@ -1,9 +1,10 @@
 export enum SocorroStatus {
   PENDING = 'pendente',
-  ACCEPTED = 'aceito',
-  ON_THE_WAY = 'à_caminho',
-  ON_SITE = 'no_local',
+  ACCEPTED = 'ACEITO',
+  ON_THE_WAY = 'A_CAMINHO',
+  ON_SITE = 'NO_LOCAL',
   COMPLETED = 'concluído',
   FINALIZADO = 'FINALIZADO',
-  CANCELLED = 'cancelado',
+  CANCELLED = 'CANCELADO',
+  UNASSIGNED = 'UNASSIGNED'
 }

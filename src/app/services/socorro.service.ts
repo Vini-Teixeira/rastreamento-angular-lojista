@@ -70,4 +70,12 @@ export class SocorrosService {
       { headers: { Authorization: `Bearer ${token}` } }
     )
   }
+
+  liberarCheckInManual(id: string): Observable<Socorro> {
+    return this.http.patch<Socorro>(`${this.apiUrl}/${id}/liberar-checkin`, {});
+}
+
+  cancelarSocorro(id: string): Observable<Socorro> {
+    return this.http.patch<Socorro>(`${this.apiUrl}/${id}/cancelar`, {});
+}
 }

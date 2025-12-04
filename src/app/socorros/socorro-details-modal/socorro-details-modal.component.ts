@@ -298,9 +298,47 @@ export class SocorroDetailsModalComponent
     window.open(url, '_blank');
   }
 
+  onLiberarCheckIn(): void {
+    if (!confirm('Confirmar a liberação manual do check-in? O status mudará para "No Local".')) {
+      return;
+    }
+    this.socorrosService.liberarCheckInManual(this.socorro._id).subscribe({
+      next: (updatedSocorro) => {
+        this.snackBar.open('Check-in liberado com sucesso!', 'Fechar', {
+          duration: 3000,
+        });
+        this.socorro = updatedSocorro;
+      },
+      error: (err) => {
+        this.snackBar.open(
+          `Erro: ${err.error?.message || 'Falha ao liberar check-in'}`,
+          'Fechar',
+          { duration: 5000 },
+        );
+      },
+    });
+}
+
   onCancelarSocorro(): void {
-    // Implemente sua lógica de cancelamento aqui
-    if (!confirm('Tem certeza que deseja cancelar este socorro?')) return;
-    // this.socorrosService.cancelar...
-  }
+    if (!confirm('Tem certeza que deseja cancelar este socorro? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+    this.socorrosService.cancelarSocorro(this.socorro._id).subscribe({
+      next: (updatedSocorro) => {
+        this.snackBar.open('Socorro cancelado com sucesso.', 'Fechar', {
+          duration: 3000,
+        });
+        this.socorro = updatedSocorro;
+        this.dialogRef.close(true);
+      },
+      error: (err) => {
+        console.error(err);
+        this.snackBar.open(
+          `Erro: ${err.error?.message || 'Falha ao cancelar socorro'}`,
+          'Fechar',
+          { duration: 5000 },
+        );
+      },
+    });
+}
 }

@@ -76,6 +76,6 @@ export class SocorrosService {
 }
 
   cancelarSocorro(id: string): Observable<Socorro> {
-    return this.http.post<Socorro>(`${this.apiUrl}/${id}/cancelar`, {});
+    return this.http.patch<Socorro>(`${this.apiUrl}/${id}/cancelar`, {});
 }
 }
